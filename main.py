@@ -7,6 +7,8 @@ import logging
 import os
 from dotenv import load_dotenv
 from lightstreamer.client import *
+from trading_ig import IGService, IGStreamService
+from trading_ig.config import config
 
 from models import SubListener
 
@@ -17,10 +19,10 @@ ENV = "LIVE" # "DEMO" or "LIVE"
 
 LS_URL = "https://push.lightstreamer.com"
 API_URL = os.getenv(f"IG_API_URL_{ENV}")
-USERNAME = os.getenv("IG_USERNAME")
-PASSWORD = os.getenv("IG_PASSWORD")
-API_KEY = os.getenv(f"IG_API_KEY_{ENV}")
-ACCOUNT_ID = os.getenv(f"IG_ACCOUNT_ID_{ENV}")
+USERNAME = os.getenv("IG_SERVICE_USERNAME")
+PASSWORD = os.getenv("IG_SERVICE_PASSWORD")
+API_KEY = os.getenv(f"IG_SERVICE_API_KEY_{ENV}")
+ACCOUNT_ID = os.getenv(f"IG_SERVICE_ACCOUNT_ID_{ENV}")
 
 IG_ITEMS = ["CS.D.EURUSD.CFD.IP", "CS.D.GBPUSD.CFD.IP", "CS.D.USDJPY.CFD.IP"]
 
@@ -62,15 +64,16 @@ def get_stream_auth_tokens(auth_json):
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Authorization": f"Bearer {auth_json['oauthToken']['access_token']}",
-        "IG-ACCOUNT-ID": auth_json['clientId'],
-        "Version": "1"
+        "IG-ACCOUNT-ID": auth_json['accountId'],
+        "IG-API-KEY": API_KEY,
+        "Version": "3"
     }
 
     params = {
         "fetchSessionTokens": "true"
     }
 
-    resp = requests.get(f"{API_URL}/session", headers=headers)
+    resp = requests.get(f"{API_URL}/session", headers=headers, params=params)
     resp.raise_for_status()
     response_json = resp.json()
     logger.info("Obtained stream auth tokens")
