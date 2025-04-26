@@ -1,21 +1,34 @@
 import time
+import threading
 import requests
 import websocket
 import json
-import logger
-from dotenv import load_dotenv
+import logging
 import os
+from dotenv import load_dotenv
+from lightstreamer_client import LightstreamerClient, Subscription
 
+logger = logging.getLogger(__name__)
 load_dotenv()
 
-# Configuración
-API_URL = "https://api.ig.com/gateway/deal/session"
-WS_URL = "wss://push.lightstreamer.com/lightstreamer"
+API_URL = "https://api.ig.com/gateway/deal"
+LS_URL = "https://push.lightstreamer.com"
+
+ENV = "DEMO" # "DEMO" or "LIVE"
 
 USERNAME = os.getenv("IG_USERNAME")
 PASSWORD = os.getenv("IG_PASSWORD")
-API_KEY = os.getenv("IG_API_KEY")
-ACCOUNT_ID = os.getenv("IG_ACCOUNT_ID")
+API_KEY = os.getenv(f"IG_API_KEY_{ENV}")
+ACCOUNT_ID = os.getenv(f"IG_ACCOUNT_ID_{ENV}")
+
+IG_ITEMS = ["CS.D.EURUSD.CFD.IP", "CS.D.GBPUSD.CFD.IP", "CS.D.USDJPY.CFD.IP"]
+
+
+def heartbeat():
+    while True:
+        with open("/tmp/heartbeat.txt", "w") as f:
+            f.write(str(time.time()))
+        time.sleep(5)
 
 
 def authenticate():
@@ -30,56 +43,61 @@ def authenticate():
         "identifier": USERNAME,
         "password": PASSWORD
     }
-    resp = requests.post(API_URL, json=data, headers=headers)
+    resp = requests.post(f"{API_URL}/session", json=data, headers=headers)
     resp.raise_for_status()
     cst = resp.headers.get("CST")
     x_security_token = resp.headers.get("X-SECURITY-TOKEN")
-    logger.success("Authenticated")
+    logger.info("Authenticated")
     return cst, x_security_token
 
 
-def on_message(ws, message):
-    logger.info(f"Message received: {message}")
-
-
-def on_error(ws, error):
-    logger.error(f"WebSocket error: {error}")
-
-
-def on_close(ws, close_status_code, close_msg):
-    logger.warning("WebSocket closed")
-
-
-def on_open(ws):
-    logger.success("WebSocket connection opened")
-    # Aquí deberías mandar tu mensaje de suscripción a un instrumento concreto
+def on_item_update(update):
+    logger.info(f"Update received: {update.name} -> {update.field_values}")
 
 
 def run():
+
+    threading.Thread(target=heartbeat, daemon=True).start()
+
     while True:
         try:
-            cst, token = authenticate()
+            # REST API Authentication
+            cst, x_security_token = authenticate()
 
-            headers = {
-                "CST": cst,
-                "X-SECURITY-TOKEN": token
-            }
-
-            ws = websocket.WebSocketApp(
-                WS_URL,
-                header=[f"CST: {cst}", f"X-SECURITY-TOKEN: {token}"],
-                on_open=on_open,
-                on_message=on_message,
-                on_error=on_error,
-                on_close=on_close
+            # Lightstreamer Client
+            client = LightstreamerClient(
+                LS_URL,
+                adapter_set="DEFAULT"
             )
 
-            ws.run_forever(ping_interval=20, ping_timeout=10)
+            # Stream Client Authentication
+            client.connection_details.set_user(ACCOUNT_ID)
+            client.connection_details.set_password(f"CST-{cst}|XST-{x_security_token}")
+
+            logger.info("Connecting to Lightstreamer server...")
+            client.connect()
+
+            # Define subscription
+            subscription = Subscription(
+                mode="MERGE",
+                items=IG_ITEMS,
+            fields=["BID", "OFFER", "HIGH", "LOW", "UPDATE_TIME", "MARKET_STATE"]
+            )
+            subscription.add_listener(on_item_update)
+
+            # Subscribe to items
+            client.subscribe(subscription)
+
+            logger.info("Subscription activated, listening for updates...")
+
+            # Keep the script running
+            while True:
+                time.sleep(1)
 
         except Exception as e:
             logger.exception(f"Exception in main loop: {e}")
 
-        logger.info("Waiting 5 seconds before retrying...")
+        logger.info("Waiting 5 seconds before retrying connection...")
         time.sleep(5)
 
 

@@ -1,0 +1,9 @@
+services:
+  price_collector:
+    build: .
+    restart: always
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/heartbeat.txt"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
