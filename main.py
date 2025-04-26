@@ -6,22 +6,27 @@ import json
 import logging
 import os
 from dotenv import load_dotenv
-from lightstreamer_client import LightstreamerClient, Subscription
+from lightstreamer.client import *
+
+from models import SubListener
 
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-API_URL = "https://api.ig.com/gateway/deal"
+ENV = "LIVE" # "DEMO" or "LIVE"
+
 LS_URL = "https://push.lightstreamer.com"
-
-ENV = "DEMO" # "DEMO" or "LIVE"
-
+API_URL = os.getenv(f"IG_API_URL_{ENV}")
 USERNAME = os.getenv("IG_USERNAME")
 PASSWORD = os.getenv("IG_PASSWORD")
 API_KEY = os.getenv(f"IG_API_KEY_{ENV}")
 ACCOUNT_ID = os.getenv(f"IG_ACCOUNT_ID_{ENV}")
 
 IG_ITEMS = ["CS.D.EURUSD.CFD.IP", "CS.D.GBPUSD.CFD.IP", "CS.D.USDJPY.CFD.IP"]
+
+
+def wait_for_input():
+    input("{0:-^80}\n".format("HIT CR TO UNSUBSCRIBE AND DISCONNECT FROM LIGHTSTREAMER"))
 
 
 def heartbeat():
@@ -34,9 +39,9 @@ def heartbeat():
 def authenticate():
     logger.info("Authenticating...")
     headers = {
-        "X-IG-API-KEY": API_KEY,
         "Content-Type": "application/json",
         "Accept": "application/json",
+        "X-IG-API-KEY": API_KEY,
         "Version": "3"
     }
     data = {
@@ -45,60 +50,82 @@ def authenticate():
     }
     resp = requests.post(f"{API_URL}/session", json=data, headers=headers)
     resp.raise_for_status()
-    cst = resp.headers.get("CST")
-    x_security_token = resp.headers.get("X-SECURITY-TOKEN")
+    response_json = resp.json()
     logger.info("Authenticated")
-    return cst, x_security_token
+    return response_json
 
 
-def on_item_update(update):
-    logger.info(f"Update received: {update.name} -> {update.field_values}")
+def get_stream_auth_tokens(auth_json):
+
+    logger.info("Obtaining stream auth tokens...")
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": f"Bearer {auth_json['oauthToken']['access_token']}",
+        "IG-ACCOUNT-ID": auth_json['clientId'],
+        "Version": "1"
+    }
+
+    params = {
+        "fetchSessionTokens": "true"
+    }
+
+    resp = requests.get(f"{API_URL}/session", headers=headers)
+    resp.raise_for_status()
+    response_json = resp.json()
+    logger.info("Obtained stream auth tokens")
+    return response_json['cst'], response_json['x-st']  # cst, x-st
+
+def generate_sub():
+    sub = Subscription("MERGE", IG_ITEMS, ["stock_name", "last_price", "time", "bid", "ask"])
+    sub.setDataAdapter("QUOTE_ADAPTER")
+
+    return sub
 
 
 def run():
 
     threading.Thread(target=heartbeat, daemon=True).start()
 
-    while True:
-        try:
-            # REST API Authentication
-            cst, x_security_token = authenticate()
+    try:
 
-            # Lightstreamer Client
-            client = LightstreamerClient(
-                LS_URL,
-                adapter_set="DEFAULT"
-            )
+        logger.info("Obtaining cst and security token...")
+        auth_json = authenticate()
 
-            # Stream Client Authentication
-            client.connection_details.set_user(ACCOUNT_ID)
-            client.connection_details.set_password(f"CST-{cst}|XST-{x_security_token}")
+        cst, xst = get_stream_auth_tokens(auth_json)
 
-            logger.info("Connecting to Lightstreamer server...")
-            client.connect()
+        loggerProvider = ConsoleLoggerProvider(ConsoleLogLevel.WARN)
+        LightstreamerClient.setLoggerProvider(loggerProvider)
 
-            # Define subscription
-            subscription = Subscription(
-                mode="MERGE",
-                items=IG_ITEMS,
-            fields=["BID", "OFFER", "HIGH", "LOW", "UPDATE_TIME", "MARKET_STATE"]
-            )
-            subscription.add_listener(on_item_update)
+        logger.info("Creating Lightstreamer client...")
+        client = LightstreamerClient(
+            auth_json['lightstreamerEndpoint'],
+            adapterSet=None
+        )
+        client.connectionDetails.setUser(auth_json['clientId'])
+        client.connectionDetails.setPassword(auth_json['oauthToken']['access_token'])
+        client.connect()
 
-            # Subscribe to items
-            client.subscribe(subscription)
+        logger.info(f"Generating subscription for items {IG_ITEMS}...")
+        sub = generate_sub()
 
-            logger.info("Subscription activated, listening for updates...")
+        logger.info("Setting up subscription...")
+        sub.addListener(SubListener())
+        client.subscribe(sub)
 
-            # Keep the script running
-            while True:
-                time.sleep(1)
+        wait_for_input()
 
-        except Exception as e:
-            logger.exception(f"Exception in main loop: {e}")
+        # Unsubscribing from Lightstreamer by using the subscription as key
+        client.unsubscribe(sub)
 
-        logger.info("Waiting 5 seconds before retrying connection...")
-        time.sleep(5)
+        # Disconnecting
+        client.disconnect()
+
+    except Exception as e:
+        logger.exception(f"Exception in main loop: {e}")
+
+    logger.info("Waiting 5 seconds before retrying connection...")
+    time.sleep(5)
 
 
 if __name__ == "__main__":
