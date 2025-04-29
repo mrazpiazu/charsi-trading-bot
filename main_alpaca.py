@@ -1,34 +1,21 @@
 import time
 import threading
 from datetime import datetime as dt, timedelta
+import datetime
 import logging
 import os
 from dotenv import load_dotenv
-from lightstreamer.client import *
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
 
-from models import SubListener
+from indicators import *
 
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-ENV = "LIVE" # "DEMO" or "LIVE"
-
-LS_URL = "https://push.lightstreamer.com"
-API_URL = os.getenv(f"IG_API_URL_{ENV}")
-USERNAME = os.getenv("IG_SERVICE_USERNAME")
-PASSWORD = os.getenv("IG_SERVICE_PASSWORD")
-API_KEY = os.getenv(f"IG_SERVICE_API_KEY_{ENV}")
-ACCOUNT_ID = os.getenv(f"IG_SERVICE_ACCOUNT_ID_{ENV}")
-
-IG_ITEMS = ["CS.D.EURUSD.CFD.IP", "CS.D.GBPUSD.CFD.IP", "CS.D.USDJPY.CFD.IP"]
-
-
-def wait_for_input():
-    input("{0:-^80}\n".format("HIT CR TO UNSUBSCRIBE AND DISCONNECT FROM LIGHTSTREAMER"))
-
+STOCK_SYMBOLS = ["TSLA", "AAAPL", "GOOGL", "AMZN", "MSFT"]
+FOREX_ITEMS = ["EUR/USD", "GBP/USD", "USD/JPY"]
 
 def heartbeat():
     while True:
@@ -37,14 +24,7 @@ def heartbeat():
         time.sleep(5)
 
 
-def generate_sub():
-    sub = Subscription("MERGE", IG_ITEMS, ["stock_name", "last_price", "time", "bid", "ask"])
-    sub.setDataAdapter("QUOTE_ADAPTER")
-
-    return sub
-
-
-def run():
+def run_stock_data():
 
     threading.Thread(target=heartbeat, daemon=True).start()
 
@@ -57,14 +37,34 @@ def run():
         )
 
         request_params = StockBarsRequest(
-            symbol_or_symbols=["AAPL"],
+            symbol_or_symbols=STOCK_SYMBOLS,
             timeframe=TimeFrame.Hour,
-            start=dt.strftime(dt.now() - timedelta(days=30), '%Y-%m-%dT%H:%M:%S.%fZ')
+            start=dt.strftime(dt.now(datetime.timezone.utc) - timedelta(hours=24), '%Y-%m-%dT%H:%M:%S.%fZ')
         )
 
         bars = client.get_stock_bars(request_params)
 
         df = bars.df
+
+        # Extract datetime from multiindex
+        df.reset_index(inplace=True)
+
+        df_indicators_total = pd.DataFrame()
+
+        for symbol in STOCK_SYMBOLS:
+            df_indicators = df[df['symbol'] == symbol]
+            rsi = calculate_rsi(df_indicators, period=14)
+            smna = calculate_sma(df_indicators, period=14)
+            ema = calculate_ema(df_indicators, period=14)
+            macd = calculate_macd(df_indicators, short_window=12, long_window=26, signal_window=9)
+            df_indicators['RSI'] = rsi
+            df_indicators['SMA'] = smna
+            df_indicators['EMA'] = ema
+            df_indicators['MACD'] = macd['MACD']
+            df_indicators['Signal'] = macd['Signal']
+            df_indicators['MACD_Hist'] = macd['MACD'] - macd['Signal']
+
+            df_indicators_total = pd.concat([df_indicators_total, df_indicators], ignore_index=True)
 
         return
 
@@ -76,4 +76,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    run_stock_data()
