@@ -1,11 +1,5 @@
 FROM python:3.12
 
-#COPY requirements.txt requirements.txt
-#COPY main.py main.py
-#COPY utils utils
-#COPY logs logs
-#COPY .env .env
-
 COPY . .
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
