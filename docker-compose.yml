@@ -27,14 +27,10 @@ services:
       - trading-postgresql
     networks:
       - trading-network
-    volumes:
-      - env:.
     restart: unless-stopped
 
 volumes:
     postgresql:
-        driver: local
-    env:
         driver: local
 networks:
     trading-network:
