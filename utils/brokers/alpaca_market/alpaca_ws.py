@@ -17,9 +17,9 @@ get_logger_config(logging)
 load_dotenv()
 
 STOCK_SYMBOLS = ["TSLA", "AAAPL", "GOOGL", "AMZN", "MSFT"]
-WS_URL = os.getenv('APLACA_WS_URL')
-API_KEY = os.getenv('APCA_API_KEY_ID')
-API_SECRET = os.getenv('APCA_API_SECRET_KEY')
+WS_URL = os.getenv('ALPACA_WS_URL')
+API_KEY = os.getenv('ALPACA_API_KEY_ID')
+API_SECRET = os.getenv('ALPACA_API_SECRET_KEY')
 
 
 def store_bar_sync(bar):
