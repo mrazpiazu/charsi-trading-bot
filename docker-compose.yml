@@ -27,10 +27,14 @@ services:
       - trading-postgresql
     networks:
       - trading-network
+    volumes:
+      - ./app:/app
     restart: unless-stopped
 
 volumes:
     postgresql:
+        driver: local
+    app:
         driver: local
 networks:
     trading-network:
