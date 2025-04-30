@@ -47,8 +47,6 @@ async def bar_handler(bar):
 
     await asyncio.to_thread(store_bar_sync, bar)
 
-    logging.info(bar)
-
 
 def run_stream():
 
