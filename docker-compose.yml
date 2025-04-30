@@ -28,13 +28,13 @@ services:
     networks:
       - trading-network
     volumes:
-      - .:/app
+      - ./env:.
     restart: unless-stopped
 
 volumes:
     postgresql:
         driver: local
-    app:
+    env:
         driver: local
 networks:
     trading-network:
