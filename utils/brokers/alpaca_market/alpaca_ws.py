@@ -2,9 +2,11 @@ import logging
 import os
 import asyncio
 from dotenv import load_dotenv
+from datetime import datetime as dt
+from datetime import timezone
+
 from alpaca.data.live.stock import StockDataStream
 from alpaca.data.enums import DataFeed
-from utils.technical_analysis.indicators import *
 from utils.database.db import SessionLocal
 from utils.database.models import *
 
@@ -22,7 +24,7 @@ def store_bar_sync(bar):
     session = SessionLocal()
     try:
         new_bar = StockBar(
-            created_at=bar['t'],
+            created_at=dt.fromtimestamp(bar['t'].seconds, tz=timezone.utc),
             symbol=bar['S'],
             open=bar['o'],
             close=bar['c'],

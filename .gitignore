@@ -9,6 +9,8 @@
 .env
 .venv
 
+postgresql
+
 # Local db
 *.sqlite
 

@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # logger.info("Creating database tables if they don't exist...")
-    # models.Base.metadata.create_all(bind=engine)
+    logger.info("Creating database tables if they don't exist...")
+    models.Base.metadata.create_all(bind=engine)
 
     logger.info("Starting websocket stream...")
     stream_thread = Thread(target=run_stream, daemon=True)

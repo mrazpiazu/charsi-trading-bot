@@ -28,7 +28,7 @@ services:
     networks:
       - trading-network
     volumes:
-      - ./app:/app
+      - .:/app
     restart: unless-stopped
 
 volumes:
