@@ -4,14 +4,16 @@ import asyncio
 from dotenv import load_dotenv
 from datetime import datetime as dt
 from datetime import timezone
+import utils.logger.logger
 
 from alpaca.data.live.stock import StockDataStream
 from alpaca.data.enums import DataFeed
 from utils.database.db import SessionLocal
 from utils.database.models import *
+from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
+get_logger_config(logging)
 load_dotenv()
 
 STOCK_SYMBOLS = ["TSLA", "AAAPL", "GOOGL", "AMZN", "MSFT"]

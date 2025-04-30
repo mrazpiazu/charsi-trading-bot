@@ -7,9 +7,10 @@ from threading import Thread
 from utils.database.db import engine
 from utils.database import models
 from utils.brokers.alpaca_market.alpaca_ws import run_stream
+from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger("uvicorn")
-logging.basicConfig(level=logging.INFO)
+get_logger_config(logging)
 
 
 @asynccontextmanager
@@ -21,7 +22,7 @@ async def lifespan(app: FastAPI):
     stream_thread = Thread(target=run_stream, daemon=True)
     stream_thread.start()
 
-    yield  # Application is running
+    yield
 
 
 app = FastAPI(lifespan=lifespan)
