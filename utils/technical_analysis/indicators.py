@@ -160,33 +160,3 @@ def calculate_adx(df: pd.DataFrame, period: int = 14) -> pd.Series:
     adx = 100 * ((plus_di - minus_di).abs() / (plus_di + minus_di)).rolling(window=period).mean()
 
     return adx
-
-
-def calculate_ichimoku(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculate the Ichimoku Cloud indicators for a given DataFrame.
-
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'high', 'low', and 'close' prices.
-
-    Returns:
-    pd.DataFrame: DataFrame containing the Ichimoku Cloud indicators.
-    """
-    high = df['high']
-    low = df['low']
-    close = df['close']
-
-    nine_period_high = high.rolling(window=9).max()
-    nine_period_low = low.rolling(window=9).min()
-    senkou_span_a = ((nine_period_high + nine_period_low) / 2).shift(26)
-
-    senkou_span_b = ((high.rolling(window=52).max() + low.rolling(window=52).min()) / 2).shift(26)
-    tenkan_sen = ((high.rolling(window=9).max() + low.rolling(window=9).min()) / 2)
-    kijun_sen = ((high.rolling(window=26).max() + low.rolling(window=26).min()) / 2)
-
-    return pd.DataFrame({
-        'Senkou Span A': senkou_span_a,
-        'Senkou Span B': senkou_span_b,
-        'Tenkan-sen': tenkan_sen,
-        'Kijun-sen': kijun_sen
-    })

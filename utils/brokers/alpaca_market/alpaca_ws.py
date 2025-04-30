@@ -1,10 +1,12 @@
-import time
 import logging
 import os
+import asyncio
 from dotenv import load_dotenv
 from alpaca.data.live.stock import StockDataStream
 from alpaca.data.enums import DataFeed
-from indicators import *
+from utils.technical_analysis.indicators import *
+from utils.database.db import SessionLocal
+from utils.database.models import *
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
@@ -16,7 +18,33 @@ API_KEY = os.getenv('APCA_API_KEY_ID')
 API_SECRET = os.getenv('APCA_API_SECRET_KEY')
 
 
+def store_bar_sync(bar):
+    session = SessionLocal()
+    try:
+        new_bar = StockBar(
+            created_at=bar['t'],
+            symbol=bar['S'],
+            open=bar['o'],
+            close=bar['c'],
+            high=bar['h'],
+            low=bar['l'],
+            volume=bar['v'],
+            number_trades=bar['n'],
+            volume_weighted_average_price=bar['vw']
+        )
+        session.merge(new_bar)
+        session.commit()
+    except Exception as e:
+        logging.exception(f"Error storing bar in DB: {e}")
+        session.rollback()
+    finally:
+        session.close()
+
+
 async def bar_handler(bar):
+
+    await asyncio.to_thread(store_bar_sync, bar)
+
     logging.info(bar)
 
 
