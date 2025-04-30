@@ -1,5 +1,7 @@
 docker-compose.yml
 Dockerfile
+.dockerignore
 postgresql
 .gitignore
 __pycache__
+.git
