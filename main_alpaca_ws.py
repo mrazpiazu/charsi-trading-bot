@@ -1,39 +1,28 @@
 import time
-import threading
-from datetime import datetime as dt, timedelta
 import logging
 import os
 from dotenv import load_dotenv
-import json
-import hmac
-import hashlib
 from alpaca.data.live.stock import StockDataStream
 from alpaca.data.enums import DataFeed
-from alpaca.data.models.bars import Bar
 from indicators import *
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 load_dotenv()
 
 STOCK_SYMBOLS = ["TSLA", "AAAPL", "GOOGL", "AMZN", "MSFT"]
-FOREX_ITEMS = ["EUR/USD", "GBP/USD", "USD/JPY"]
 WS_URL = os.getenv('APLACA_WS_URL')
 API_KEY = os.getenv('APCA_API_KEY_ID')
 API_SECRET = os.getenv('APCA_API_SECRET_KEY')
 
 
-def heartbeat():
-    while True:
-        with open("/tmp/heartbeat.txt", "w") as f:
-            f.write(str(time.time()))
-        time.sleep(5)
-
-
 async def bar_handler(bar):
-    print(bar)
+    logging.info(bar)
 
 
 def run_stream():
+
+    logging.info("Starting Alpaca WebSocket stream...")
 
     ws = StockDataStream(
         api_key=API_KEY,
@@ -42,6 +31,7 @@ def run_stream():
         feed=DataFeed.IEX # DataFeed.IEX | DataFeed.SIP
     )
 
+    logging.info("Connecting to Alpaca WebSocket...")
     ws.subscribe_bars(
         bar_handler,
         "*" # "*" for all stocks, STOCK_SYMBOLS for specific stocks
@@ -53,3 +43,7 @@ def run_stream():
 if __name__ == "__main__":
 
     run_stream()
+
+    # websocket(Alpaca.Markets) > database > Indicators > Filtro ATR,RSI... > model(ChatGPT) > broker(Alpaca.Markets)
+
+

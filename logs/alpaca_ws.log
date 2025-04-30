@@ -1,0 +1,109 @@
+INFO:__main__:Starting Alpaca WebSocket stream...
+INFO:__main__:Connecting to Alpaca WebSocket...
+INFO:__main__:Connected to Alpaca WebSocket.
+DEBUG:asyncio:Using proactor: IocpProactor
+INFO:alpaca.data.live.websocket:started data stream
+INFO:alpaca.data.live.websocket:starting data websocket connection
+INFO:alpaca.data.live.websocket:connecting to wss://stream.data.alpaca.markets/v2/iex
+DEBUG:websockets.client:= connection is CONNECTING
+DEBUG:websockets.client:> GET /v2/iex HTTP/1.1
+DEBUG:websockets.client:> Host: stream.data.alpaca.markets
+DEBUG:websockets.client:> Upgrade: websocket
+DEBUG:websockets.client:> Connection: Upgrade
+DEBUG:websockets.client:> Sec-WebSocket-Key: sYKwHUxErZjqQQxDT8kKBg==
+DEBUG:websockets.client:> Sec-WebSocket-Version: 13
+DEBUG:websockets.client:> Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG:websockets.client:> Content-Type: application/msgpack
+DEBUG:websockets.client:> User-Agent: APCA-PY/0.39.4
+DEBUG:websockets.client:< HTTP/1.1 101 Switching Protocols
+DEBUG:websockets.client:< Date: Wed, 30 Apr 2025 10:55:33 GMT
+DEBUG:websockets.client:< Connection: upgrade
+DEBUG:websockets.client:< Upgrade: websocket
+DEBUG:websockets.client:< Sec-WebSocket-Accept: Khdb//aNu2AJZxqsRA4hHUq4hB4=
+DEBUG:websockets.client:< Strict-Transport-Security: max-age=31536000; includeSubDomains
+DEBUG:websockets.client:= connection is OPEN
+DEBUG:websockets.client:< BINARY 91 82 a1 54 a7 73 75 63 63 65 73 73 a3 6d 73 67 ... 6f 6e 6e 65 63 74 65 64 [26 bytes]
+DEBUG:websockets.client:> BINARY 83 a6 61 63 74 69 6f 6e a4 61 75 74 68 a3 6b 65 ... 45 59 45 54 6b 33 6b 4a [87 bytes]
+DEBUG:websockets.client:< BINARY 91 82 a1 54 a7 73 75 63 63 65 73 73 a3 6d 73 67 ... 6e 74 69 63 61 74 65 64 [30 bytes]
+INFO:alpaca.data.live.websocket:connected to wss://stream.data.alpaca.markets/v2/iex
+DEBUG:websockets.client:> BINARY 82 a4 62 61 72 73 91 a1 2a a6 61 63 74 69 6f 6e ... 75 62 73 63 72 69 62 65 [26 bytes, continued]
+DEBUG:websockets.client:> CONT '' [0 bytes]
+DEBUG:websockets.client:< BINARY 91 82 a1 54 ac 73 75 62 73 63 72 69 70 74 69 6f 6e a4 62 61 72 73 91 a1 2a [25 bytes]
+INFO:alpaca.data.live.websocket:subscribed to bars: ['*']
+DEBUG:websockets.client:% sending keepalive ping
+DEBUG:websockets.client:> PING b3 60 bd eb [binary, 4 bytes]
+DEBUG:websockets.client:< PONG b3 60 bd eb [binary, 4 bytes]
+DEBUG:websockets.client:% received keepalive pong
+DEBUG:websockets.client:% sending keepalive ping
+DEBUG:websockets.client:> PING d5 48 bc d0 [binary, 4 bytes]
+DEBUG:websockets.client:< PONG d5 48 bc d0 [binary, 4 bytes]
+DEBUG:websockets.client:% received keepalive pong
+DEBUG:websockets.client:% sending keepalive ping
+DEBUG:websockets.client:> PING '\t<\u04f3' [text, 4 bytes]
+DEBUG:websockets.client:< PONG '\t<\u04f3' [text, 4 bytes]
+DEBUG:websockets.client:% received keepalive pong
+INFO:__main__:Starting Alpaca WebSocket stream...
+INFO:__main__:Connecting to Alpaca WebSocket...
+INFO:__main__:Connected to Alpaca WebSocket.
+DEBUG:asyncio:Using proactor: IocpProactor
+INFO:alpaca.data.live.websocket:started data stream
+INFO:alpaca.data.live.websocket:starting data websocket connection
+INFO:alpaca.data.live.websocket:connecting to wss://stream.data.alpaca.markets/v2/iex
+DEBUG:websockets.client:= connection is CONNECTING
+DEBUG:websockets.client:> GET /v2/iex HTTP/1.1
+DEBUG:websockets.client:> Host: stream.data.alpaca.markets
+DEBUG:websockets.client:> Upgrade: websocket
+DEBUG:websockets.client:> Connection: Upgrade
+DEBUG:websockets.client:> Sec-WebSocket-Key: V1foMO1raUx9/3rSOOrmPA==
+DEBUG:websockets.client:> Sec-WebSocket-Version: 13
+DEBUG:websockets.client:> Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG:websockets.client:> Content-Type: application/msgpack
+DEBUG:websockets.client:> User-Agent: APCA-PY/0.39.4
+DEBUG:websockets.client:< HTTP/1.1 101 Switching Protocols
+DEBUG:websockets.client:< Date: Wed, 30 Apr 2025 10:56:19 GMT
+DEBUG:websockets.client:< Connection: upgrade
+DEBUG:websockets.client:< Upgrade: websocket
+DEBUG:websockets.client:< Sec-WebSocket-Accept: kgzbMIKuN3DOVAM2Q2x03zLVi0U=
+DEBUG:websockets.client:< Strict-Transport-Security: max-age=31536000; includeSubDomains
+DEBUG:websockets.client:= connection is OPEN
+DEBUG:websockets.client:< BINARY 91 82 a1 54 a7 73 75 63 63 65 73 73 a3 6d 73 67 ... 6f 6e 6e 65 63 74 65 64 [26 bytes]
+DEBUG:websockets.client:> BINARY 83 a6 61 63 74 69 6f 6e a4 61 75 74 68 a3 6b 65 ... 45 59 45 54 6b 33 6b 4a [87 bytes]
+DEBUG:websockets.client:< BINARY 91 82 a1 54 a7 73 75 63 63 65 73 73 a3 6d 73 67 ... 6e 74 69 63 61 74 65 64 [30 bytes]
+INFO:alpaca.data.live.websocket:connected to wss://stream.data.alpaca.markets/v2/iex
+DEBUG:websockets.client:> BINARY 82 a4 62 61 72 73 91 a1 2a a6 61 63 74 69 6f 6e ... 75 62 73 63 72 69 62 65 [26 bytes, continued]
+DEBUG:websockets.client:> CONT '' [0 bytes]
+DEBUG:websockets.client:< BINARY 91 82 a1 54 ac 73 75 62 73 63 72 69 70 74 69 6f 6e a4 62 61 72 73 91 a1 2a [25 bytes]
+INFO:alpaca.data.live.websocket:subscribed to bars: ['*']
+DEBUG:websockets.client:% sending keepalive ping
+DEBUG:websockets.client:> PING a0 0a ae 87 [binary, 4 bytes]
+DEBUG:websockets.client:< PONG a0 0a ae 87 [binary, 4 bytes]
+DEBUG:websockets.client:% received keepalive pong
+DEBUG:asyncio:Using proactor: IocpProactor
+INFO:alpaca.data.live.websocket:started data stream
+INFO:alpaca.data.live.websocket:starting data websocket connection
+INFO:alpaca.data.live.websocket:connecting to wss://stream.data.alpaca.markets/v2/iex
+DEBUG:websockets.client:= connection is CONNECTING
+DEBUG:websockets.client:> GET /v2/iex HTTP/1.1
+DEBUG:websockets.client:> Host: stream.data.alpaca.markets
+DEBUG:websockets.client:> Upgrade: websocket
+DEBUG:websockets.client:> Connection: Upgrade
+DEBUG:websockets.client:> Sec-WebSocket-Key: nS1TMlQ+7grwA1Lta78sIg==
+DEBUG:websockets.client:> Sec-WebSocket-Version: 13
+DEBUG:websockets.client:> Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG:websockets.client:> Content-Type: application/msgpack
+DEBUG:websockets.client:> User-Agent: APCA-PY/0.39.4
+DEBUG:websockets.client:< HTTP/1.1 101 Switching Protocols
+DEBUG:websockets.client:< Date: Wed, 30 Apr 2025 10:57:33 GMT
+DEBUG:websockets.client:< Connection: upgrade
+DEBUG:websockets.client:< Upgrade: websocket
+DEBUG:websockets.client:< Sec-WebSocket-Accept: gVDpoFDkp3AgtWpcWkSwAsXYWrU=
+DEBUG:websockets.client:< Strict-Transport-Security: max-age=31536000; includeSubDomains
+DEBUG:websockets.client:= connection is OPEN
+DEBUG:websockets.client:< BINARY 91 82 a1 54 a7 73 75 63 63 65 73 73 a3 6d 73 67 ... 6f 6e 6e 65 63 74 65 64 [26 bytes]
+DEBUG:websockets.client:> BINARY 83 a6 61 63 74 69 6f 6e a4 61 75 74 68 a3 6b 65 ... 45 59 45 54 6b 33 6b 4a [87 bytes]
+DEBUG:websockets.client:< BINARY 91 82 a1 54 a7 73 75 63 63 65 73 73 a3 6d 73 67 ... 6e 74 69 63 61 74 65 64 [30 bytes]
+INFO:alpaca.data.live.websocket:connected to wss://stream.data.alpaca.markets/v2/iex
+DEBUG:websockets.client:> BINARY 82 a4 62 61 72 73 91 a1 2a a6 61 63 74 69 6f 6e ... 75 62 73 63 72 69 62 65 [26 bytes, continued]
+DEBUG:websockets.client:> CONT '' [0 bytes]
+DEBUG:websockets.client:< BINARY 91 82 a1 54 ac 73 75 62 73 63 72 69 70 74 69 6f 6e a4 62 61 72 73 91 a1 2a [25 bytes]
+INFO:alpaca.data.live.websocket:subscribed to bars: ['*']
