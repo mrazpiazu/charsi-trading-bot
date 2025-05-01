@@ -12,6 +12,8 @@ x-airflow-common:
     - ./airflow_config:/opt/airflow/config
     - ./airflow_plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID:-50000}"
+  networks:
+    - trading-network
   depends_on:
     &airflow-common-depends-on
     postgres:
@@ -48,6 +50,8 @@ services:
     networks:
       - trading-network
     restart: unless-stopped
+
+  # Airflow services
   airflow-postgresql:
     image: postgres:latest
     environment:
@@ -64,8 +68,6 @@ services:
       retries: 5
       start_period: 5s
     restart: always
-    networks:
-      - trading-network
   airflow-webserver:
     <<: *airflow-common
     command: webserver
@@ -78,8 +80,6 @@ services:
       retries: 5
       start_period: 30s
     restart: always
-    networks:
-      - trading-network
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -94,8 +94,6 @@ services:
       retries: 5
       start_period: 30s
     restart: always
-    networks:
-      - trading-network
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -110,8 +108,6 @@ services:
       retries: 5
       start_period: 30s
     restart: always
-    networks:
-      - trading-network
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -181,8 +177,6 @@ services:
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
         exec /entrypoint airflow version
-    networks:
-      - trading-network
     env_file:
       - .env
     user: "0:0"
