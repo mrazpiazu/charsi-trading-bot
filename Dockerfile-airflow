@@ -1,0 +1,5 @@
+FROM apache/airflow:latest-python3.12
+
+ARG AIRFLOW_USER_HOME=/opt/airflow
+
+RUN pip install --upgrade pip && pip install apache-airflow==${AIRFLOW_VERSION} -r requirements.txt
