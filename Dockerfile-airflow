@@ -2,6 +2,6 @@ FROM apache/airflow:latest-python3.12
 
 ARG AIRFLOW_USER_HOME=/opt/airflow
 
-ADD requirements.txt .
+ADD requirements-airflow.txt .
 ADD .env .
-RUN pip install --upgrade pip && pip install apache-airflow==${AIRFLOW_VERSION} -r requirements.txt
+RUN pip install --upgrade pip && pip install apache-airflow==${AIRFLOW_VERSION} -r requirements-airflow.txt
