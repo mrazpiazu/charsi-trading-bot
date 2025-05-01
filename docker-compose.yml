@@ -16,7 +16,7 @@ x-airflow-common:
     - trading-network
   depends_on:
     &airflow-common-depends-on
-    postgres:
+    airflow-postgresql:
       condition: service_healthy
 
 services:
