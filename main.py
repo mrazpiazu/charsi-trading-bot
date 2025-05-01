@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-import asyncio
 import logging
 from threading import Thread
+import dotenv
 
 from utils.database.db import engine
 from utils.database import models
 from utils.brokers.alpaca_market.alpaca_ws import run_stream
 from utils.logger.logger import get_logger_config
+
+dotenv.load_dotenv()
 
 logger = logging.getLogger("uvicorn")
 get_logger_config(logging)
