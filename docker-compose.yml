@@ -20,6 +20,7 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+  # Trading scraper services
   trading-postgresql:
     image: postgres:latest
     container_name: trading-postgresql
@@ -27,7 +28,7 @@ services:
       POSTGRES_USER: ${TRADING_POSTGRES_USER}
       POSTGRES_PASSWORD: ${TRADING_POSTGRES_PASSWORD}
       POSTGRES_PORT: ${TRADING_POSTGRES_PORT}
-      POSTGRES_DB: trading
+      POSTGRES_DB: ${TRADING_POSTGRES_DB}
     ports:
       - "${TRADING_POSTGRES_PORT}:5432"
     volumes:
@@ -40,11 +41,8 @@ services:
       context: .
       dockerfile: Dockerfile-trading-scraper
     container_name: trading-scraper
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=trading-postgresql
-      - POSTGRES_PORT=5432
+    env_file:
+      .env
     depends_on:
       - trading-postgresql
     networks:
@@ -57,6 +55,7 @@ services:
     environment:
       POSTGRES_USER: ${AIRFLOW_POSTGRES_USER}
       POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${AIRFLOW_POSTGRES_PORT}
       POSTGRES_DB: ${AIRFLOW_POSTGRES_DB}
     volumes:
       - ./airflow-postgresql:/var/lib/postgresql/data
