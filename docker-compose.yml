@@ -30,7 +30,7 @@ services:
       POSTGRES_PORT: ${TRADING_POSTGRES_PORT}
       POSTGRES_DB: ${TRADING_POSTGRES_DB}
     ports:
-      - "${TRADING_POSTGRES_PORT}:5432"
+      - "5434:5432"
     volumes:
       - ./postgresql:/var/lib/postgresql/data
     networks:
@@ -60,7 +60,7 @@ services:
     volumes:
       - ./airflow-postgresql:/var/lib/postgresql/data
     ports:
-        - "${AIRFLOW_POSTGRES_PORT}:5432"
+        - "5435:5432"
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "airflow" ]
       interval: 10s
