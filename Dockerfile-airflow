@@ -5,7 +5,6 @@ ARG AIRFLOW_USER_HOME=/opt/airflow
 ADD requirements.txt .
 ADD .env .
 
-RUN sudo apt update -y
 RUN pip install --upgrade pip && pip install apache-airflow[postgres,auth]==${AIRFLOW_VERSION} -r requirements.txt
 
 USER root
