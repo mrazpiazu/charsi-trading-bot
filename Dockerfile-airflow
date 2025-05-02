@@ -14,11 +14,17 @@ RUN sudo apt update -y && sudo apt install -y patch patchutils
 
 RUN set -ex; \
     cd /home/airflow/.local/lib/python3.12/site-packages/airflow; \
-    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49721.patch \
-    | filterdiff -p1 -i 'airflow-core/src/airflow/*' | patch -p4 -u --verbose; \
-    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49724.patch \
-    | patch -p5 -u --verbose; \
-    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49581.patch \
-    | filterdiff -p1 -i 'providers/fab/src/airflow/*' | patch -p5 -u --verbose
+    echo "Applying patch 49721..."; \
+    curl -sSL https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49721.patch \
+      | filterdiff -p1 -i 'airflow-core/src/airflow/*' \
+      | patch -p4 -u --verbose || echo "Patch 49721 failed or already applied, skipping."; \
+    echo "Applying patch 49724..."; \
+    curl -sSL https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49724.patch \
+      | patch -p5 -u --verbose || echo "Patch 49724 failed or already applied, skipping."; \
+    echo "Applying patch 49581..."; \
+    curl -sSL https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49581.patch \
+      | filterdiff -p1 -i 'providers/fab/src/airflow/*' \
+      | patch -p5 -u --verbose || echo "Patch 49581 failed or already applied, skipping."
+
 
 RUN pip install --upgrade pip && pip install apache-airflow[postgres,auth]==${AIRFLOW_VERSION} -r requirements.txt
