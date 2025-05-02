@@ -9,7 +9,7 @@ RUN sudo apt update -y
 RUN pip install --upgrade pip && pip install apache-airflow[postgres,auth]==${AIRFLOW_VERSION} -r requirements.txt
 
 USER root
-RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN sudo apt update -y && sudo apt install -y patch patchutils
 
