@@ -1,15 +1,15 @@
-FROM apache/airflow:latest-python3.12
+FROM apache/airflow:3.0.0
 
 ARG AIRFLOW_USER_HOME=/opt/airflow
 
 ADD requirements.txt .
 ADD .env .
 
-USER root
-RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-USER airflow
 RUN sudo apt update -y
 RUN pip install --upgrade pip && pip install apache-airflow[postgres,auth]==${AIRFLOW_VERSION} -r requirements.txt
+
+USER root
+RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN sudo apt update -y && sudo apt install -y patch patchutils
 
@@ -27,4 +27,4 @@ RUN set -ex; \
       | filterdiff -p1 -i 'providers/fab/src/airflow/*' \
       | patch -p5 -u --verbose || echo "Patch 49581 failed or already applied, skipping."
 
-
+USER airflow
