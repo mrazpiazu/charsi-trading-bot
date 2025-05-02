@@ -52,6 +52,7 @@ services:
   # Airflow services
   airflow-postgresql:
     image: postgres:latest
+    container_name: trading-airflow-postgresql
     environment:
       POSTGRES_USER: ${AIRFLOW_POSTGRES_USER}
       POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD}
@@ -59,6 +60,8 @@ services:
       POSTGRES_DB: ${AIRFLOW_POSTGRES_DB}
     volumes:
       - ./airflow-postgresql:/var/lib/postgresql/data
+    networks:
+      - trading-network
     ports:
         - "5435:5432"
     healthcheck:
@@ -70,6 +73,7 @@ services:
   airflow-webserver:
     <<: *airflow-common
     command: webserver
+    container_name: trading-airflow-webserver
     ports:
       - "8080:8080"
     healthcheck:
@@ -79,6 +83,8 @@ services:
       retries: 5
       start_period: 30s
     restart: always
+    networks:
+      - trading-network
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -86,6 +92,7 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    container_name: trading-airflow-scheduler
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://localhost:8974/health" ]
       interval: 30s
@@ -93,6 +100,8 @@ services:
       retries: 5
       start_period: 30s
     restart: always
+    networks:
+      - trading-network
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -100,6 +109,7 @@ services:
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
+    container_name: trading-airflow-triggerer
     healthcheck:
       test: [ "CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"' ]
       interval: 30s
@@ -111,9 +121,12 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+        - trading-network
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
+    container_name: trading-airflow-init
     command:
       - -c
       - |
@@ -181,10 +194,13 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
+    networks:
+      - trading-network
   airflow-cli:
     <<: *airflow-common
     profiles:
       - debug
+    container_name: trading-airflow-cli
     env_file:
       - .env
     command:
