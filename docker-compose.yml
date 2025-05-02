@@ -11,7 +11,7 @@ x-airflow-common:
     - ./airflow_logs:/opt/airflow/logs
     - ./airflow_config:/opt/airflow/config
     - ./airflow_plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID:-50000}"
+  user: "${AIRFLOW_UID:-50000}:0"
   networks:
     - trading-network
   depends_on:
