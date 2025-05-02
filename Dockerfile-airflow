@@ -6,8 +6,11 @@ ADD requirements.txt .
 ADD .env .
 
 USER root
+RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER airflow
+RUN sudo apt update -y
 
-RUN apt update && apt install -y patch patchutils
+RUN sudo apt update -y && sudo apt install -y patch patchutils
 
 RUN set -ex; \
     cd /home/airflow/.local/lib/python3.12/site-packages/airflow; \
@@ -17,7 +20,5 @@ RUN set -ex; \
     | patch -p5 -u --verbose; \
     curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49581.patch \
     | filterdiff -p1 -i 'providers/fab/src/airflow/*' | patch -p5 -u --verbose
-
-USER airflow
 
 RUN pip install --upgrade pip && pip install apache-airflow[postgres,auth]==${AIRFLOW_VERSION} -r requirements.txt
