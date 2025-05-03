@@ -27,7 +27,7 @@ def get_active_symbols():
         session.close()
 
 
-def load_stock_table():
+def load_stock_table_list(group_by=None):
     """
     Load the Stock table from the database.
     Returns:
@@ -35,6 +35,39 @@ def load_stock_table():
     """
     try:
         query = session.query(Stock)
+        stock_table = query.all()
+
+        stock_table_list = [symbol.symbol for symbol in stock_table]
+
+        if group_by == 'alphabetical':
+            # Group list by starting letter
+            stock_table_list.sort()
+            grouped_stock_table = {}
+            for symbol in stock_table_list:
+                starting_letter = symbol[0].upper()
+                if starting_letter not in grouped_stock_table:
+                    grouped_stock_table[starting_letter] = []
+                grouped_stock_table[starting_letter].append(symbol)
+
+        return stock_table_list
+    except Exception as e:
+        logger.error(f"Error loading Stock table: {e}")
+        return []
+    finally:
+        session.close()
+
+
+def load_stock_starting_by(starting_letter):
+
+    """
+    Load the Stock table from the database.
+    Args:
+        starting_letter (str): Starting letter to filter symbols.
+    Returns:
+        list: List of Stock objects starting with the specified letter.
+    """
+    try:
+        query = session.query(Stock).filter(Stock.symbol.like(f"{starting_letter}%"))
         stock_table = query.all()
 
         stock_table_list = [symbol.symbol for symbol in stock_table]
@@ -68,26 +101,30 @@ def update_stocks():
             session.rollback()
 
 
-
-def backfill_symbol_data(start_time, end_time, symbol):
+def backfill_symbol_data(start_time, end_time, symbol_item):
     """
     Backfill data for a specific symbol.
     """
 
+    symbols_list = load_stock_starting_by(symbol_item)
+
     with open("utils/database/stock_bar_backfill.sql", "r") as file:
         sql_query = text(file.read())
 
-    try:
-        session.execute(sql_query, {
-            "symbol": symbol,
-            "start_time": start_time,
-            "end_time": end_time
-        })
-        session.commit()
-    except Exception as e:
-        logger.error(f"Error backfilling symbol data: {e}")
-        session.rollback()
-        raise(e)
+    for symbol in symbols_list:
+        logger.info(f"Backfilling data for symbol: {symbol}")
+
+        try:
+            session.execute(sql_query, {
+                "symbol": symbol,
+                "start_time": start_time,
+                "end_time": end_time
+            })
+            session.commit()
+        except Exception as e:
+            logger.error(f"Error backfilling symbol data: {e}")
+            session.rollback()
+            raise(e)
 
 
 if __name__ == "__main__":

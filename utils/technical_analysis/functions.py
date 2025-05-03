@@ -3,6 +3,7 @@ import pandas as pd
 from sqlalchemy import text
 
 from utils.database.db import SessionLocal
+from utils.database.functions import load_stock_starting_by
 from utils.database.models import StockBar
 from utils.logger.logger import get_logger_config
 from utils.technical_analysis.indicators import *
@@ -61,21 +62,29 @@ def run_technical_analysis(symbol):
     return
 
 
-def run_technical_analysis_sql(data_interval_start, data_interval_end, symbol):
+def run_technical_analysis_sql(data_interval_start, data_interval_end, symbol_item):
+
+    logger.info(f"Running technical analysis for symbols stating by: {symbol_item}")
+
+    symbols_list = load_stock_starting_by(symbol_item)
 
     with open('utils/technical_analysis/indicators.sql', 'r') as file:
         sql_query = text(file.read())
 
-    try:
-        session.execute(sql_query, {
-            'start_date': data_interval_start,
-            'end_date': data_interval_end,
-            'symbol': symbol
-        })
-        session.commit()
-    except Exception as e:
-        logger.error(f"Error executing SQL query: {e}")
-        session.rollback()
+    for symbol in symbols_list:
+
+        logger.info(f"Running technical analysis for symbol: {symbol}")
+
+        try:
+            session.execute(sql_query, {
+                'start_date': data_interval_start,
+                'end_date': data_interval_end,
+                'symbol': symbol
+            })
+            session.commit()
+        except Exception as e:
+            logger.error(f"Error executing SQL query: {e}")
+            session.rollback()
 
 
 if __name__ == '__main__':
