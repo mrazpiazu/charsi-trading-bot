@@ -9,6 +9,8 @@
 .env
 .venv
 
+*.pyc
+
 postgresql
 airflow-postgresql
 airflow_config
