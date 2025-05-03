@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 from sqlalchemy import text
+import os
 
 from utils.database.db import SessionLocal
 from utils.database.functions import load_stock_starting_by
@@ -67,6 +68,8 @@ def run_technical_analysis_sql(data_interval_start, data_interval_end, symbol_it
     logger.info(f"Running technical analysis for symbols stating by: {symbol_item}")
 
     symbols_list = load_stock_starting_by(symbol_item)
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
     with open('utils/technical_analysis/indicators.sql', 'r') as file:
         sql_query = text(file.read())
