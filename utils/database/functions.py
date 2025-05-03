@@ -1,6 +1,7 @@
 import logging
 from sqlalchemy import text
 import os
+from datetime import datetime as dt
 
 from utils.database.db import SessionLocal
 from utils.database.models import StockBar, Stock

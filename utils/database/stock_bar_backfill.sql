@@ -1,7 +1,7 @@
 WITH minute_series AS (
   SELECT generate_series(
-    :start_time::timestamp,
-    :end_time::timestamp,
+    :start_time,
+    :end_time,
     interval '1 minute'
   ) AS created_at
 ),
