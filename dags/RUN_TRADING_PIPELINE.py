@@ -1,6 +1,6 @@
 import datetime
-from airflow.sdk import dag, task, task_group
-from airflow.sdk import get_current_context
+from airflow.decorators import dag, task, task_group
+from airflow.operators.python import get_current_context
 import logging
 
 from utils.database.functions import *
