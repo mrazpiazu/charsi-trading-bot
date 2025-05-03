@@ -26,7 +26,7 @@ get_logger_config(logging)
     tags=["technical", "analysis"]
 )
 def technical_analysis_dag():
-    symbols = get_active_symbols()
+    symbols = load_stock_table()
 
     for symbol in symbols:
         group_id = f"trading_task_group_{symbol.replace('.', '_')}"

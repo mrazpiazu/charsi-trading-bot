@@ -27,6 +27,23 @@ def get_active_symbols():
         session.close()
 
 
+def load_stock_table():
+    """
+    Load the Stock table from the database.
+    Returns:
+        list: List of Stock objects.
+    """
+    try:
+        query = session.query(Stock)
+        stock_table = query.all()
+        return stock_table
+    except Exception as e:
+        logger.error(f"Error loading Stock table: {e}")
+        return []
+    finally:
+        session.close()
+
+
 def update_stocks():
     """
     Inserts distinct symbols from StockBar into Stock table
