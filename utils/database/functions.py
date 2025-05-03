@@ -36,7 +36,10 @@ def load_stock_table():
     try:
         query = session.query(Stock)
         stock_table = query.all()
-        return stock_table
+
+        stock_table_list = [symbol.symbol for symbol in stock_table]
+
+        return stock_table_list
     except Exception as e:
         logger.error(f"Error loading Stock table: {e}")
         return []
