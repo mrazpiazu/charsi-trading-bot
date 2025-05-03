@@ -42,12 +42,13 @@ def load_stock_table_list(group_by=None):
         if group_by == 'alphabetical':
             # Group list by starting letter
             stock_table_list.sort()
-            grouped_stock_table = {}
+            grouped_stock_table = []
             for symbol in stock_table_list:
                 starting_letter = symbol[0].upper()
                 if starting_letter not in grouped_stock_table:
-                    grouped_stock_table[starting_letter] = []
-                grouped_stock_table[starting_letter].append(symbol)
+                    grouped_stock_table.append(starting_letter)
+
+            stock_table_list = grouped_stock_table
 
         return stock_table_list
     except Exception as e:
