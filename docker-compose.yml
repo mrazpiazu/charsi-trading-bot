@@ -11,7 +11,7 @@ x-airflow-common:
     - ./airflow_logs:/opt/airflow/logs
     - ./airflow_config:/opt/airflow/config
     - ./airflow_plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID:-50000}:0"
+  user: 1000
   networks:
     - trading-network
   depends_on:
@@ -31,6 +31,7 @@ services:
       POSTGRES_DB: ${TRADING_POSTGRES_DB}
     ports:
       - "5434:5432"
+    user: 1000
     volumes:
       - ./postgresql:/var/lib/postgresql/data
     networks:
@@ -41,6 +42,7 @@ services:
       context: .
       dockerfile: Dockerfile-trading-scraper
     container_name: trading-scraper
+    user: 1000
     env_file:
       .env
     depends_on:
