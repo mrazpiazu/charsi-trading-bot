@@ -1,5 +1,6 @@
 import logging
 from sqlalchemy import text
+import os
 
 from utils.database.db import SessionLocal
 from utils.database.models import StockBar, Stock
@@ -109,7 +110,9 @@ def backfill_symbol_data(start_time, end_time, symbol_item):
 
     symbols_list = load_stock_starting_by(symbol_item)
 
-    with open("utils/database/stock_bar_backfill.sql", "r") as file:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    with open(f"{current_dir}/utils/database/stock_bar_backfill.sql", "r") as file:
         sql_query = text(file.read())
 
     for symbol in symbols_list:
