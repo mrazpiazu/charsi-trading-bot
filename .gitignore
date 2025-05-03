@@ -10,6 +10,7 @@
 .venv
 
 *.pyc
+__pycache__
 
 postgresql
 airflow-postgresql
