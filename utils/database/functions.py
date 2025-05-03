@@ -2,7 +2,7 @@ import logging
 from sqlalchemy import text
 
 from utils.database.db import SessionLocal
-from utils.database.models import StockBar
+from utils.database.models import StockBar, Stock
 from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger("db_functions")
@@ -22,9 +22,31 @@ def get_active_symbols():
         return symbols
     except Exception as e:
         logger.error(f"Error loading active symbols: {e}")
-        return ["test1"]
+        return []
     finally:
         session.close()
+
+
+def update_stocks():
+    """
+    Inserts distinct symbols from StockBar into Stock table
+    Returns:
+    """
+
+    distinctive_symbols = get_active_symbols()
+    query = session.query(Stock).filter(Stock.symbol.in_(distinctive_symbols))
+    existing_symbols = query.all()
+    existing_symbols_set = {symbol.symbol for symbol in existing_symbols}
+    new_symbols = set(distinctive_symbols) - existing_symbols_set
+    for symbol in new_symbols:
+        try:
+            new_stock = Stock(symbol=symbol)
+            session.add(new_stock)
+            session.commit()
+        except Exception as e:
+            logger.error(f"Error inserting symbol {symbol} into Stock table: {e}")
+            session.rollback()
+
 
 
 def backfill_symbol_data(start_time, end_time, symbol):

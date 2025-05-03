@@ -7,13 +7,13 @@ from utils.database.functions import *
 from utils.technical_analysis.functions import *
 from utils.logger.logger import get_logger_config
 
-logger = logging.getLogger("technical_analysis_dag")
+logger = logging.getLogger("trading_pipeline_dag")
 get_logger_config(logging)
 
 
 @dag(
     start_date=datetime.datetime(2025, 5, 1),
-    schedule='0 * * * *',
+    schedule='*/30 * * * *',
     catchup=True,
     max_active_runs=1,
     default_args={
