@@ -11,6 +11,7 @@
 
 *.pyc
 __pycache__
+*pycache*
 
 postgresql
 airflow-postgresql

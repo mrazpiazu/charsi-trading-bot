@@ -7,5 +7,6 @@ airflow_config
 airflow_logs
 airflow_plugins
 .gitignore
-__pycache__
 .git
+__pycache__
+*pycache*
