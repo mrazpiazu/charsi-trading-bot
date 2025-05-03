@@ -71,7 +71,7 @@ def run_technical_analysis_sql(data_interval_start, data_interval_end, symbol_it
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    with open('utils/technical_analysis/indicators.sql', 'r') as file:
+    with open(f'{current_dir}/indicators.sql', 'r') as file:
         sql_query = text(file.read())
 
     for symbol in symbols_list:

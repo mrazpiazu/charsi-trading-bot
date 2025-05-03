@@ -112,7 +112,7 @@ def backfill_symbol_data(start_time, end_time, symbol_item):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    with open(f"{current_dir}/utils/database/stock_bar_backfill.sql", "r") as file:
+    with open(f"{current_dir}/stock_bar_backfill.sql", "r") as file:
         sql_query = text(file.read())
 
     for symbol in symbols_list:
