@@ -13,7 +13,7 @@ get_logger_config(logging)
 @dag(
     start_date=datetime.datetime(2025, 5, 1),
     schedule='*/5 * * * *',
-    catchup=True,
+    catchup=False,
     max_active_runs=1,
     default_args={
         'owner': 'airflow',
