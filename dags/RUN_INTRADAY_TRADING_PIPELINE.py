@@ -12,6 +12,7 @@ get_logger_config(logging)
 
 
 @dag(
+    dag_id="intraday_trading_pipeline_dag_v1",
     start_date=datetime.datetime(2025, 5, 1),
     schedule='*/30 * * * *',
     catchup=True,
@@ -25,7 +26,7 @@ get_logger_config(logging)
     },
     tags=["analysis", "intraday", "trading"]
 )
-def technical_analysis_dag():
+def intraday_trading_pipeline_dag():
     symbol_items_list = load_stock_table_list(group_by="alphabetical")
 
     for symbol_item in symbol_items_list:
@@ -52,4 +53,4 @@ def technical_analysis_dag():
 
         trading_task_group(symbol=symbol_item)
 
-technical_analysis_dag()
+intraday_trading_pipeline_dag()
