@@ -27,10 +27,15 @@ get_logger_config(logging)
 def update_stocks_dag():
     task_id = "update_stocks"
 
-    @task(task_id=task_id)
-    def update_stocks_task():
-        update_stocks()
+    # @task(task_id=task_id)
+    # def update_stocks_task():
+    #     return update_stocks()
+    #
+    # update_stocks_task()
 
-    update_stocks_task()
+    @task(task_id=task_id)
+    def test_task():
+        logger.info("Test task executed successfully.")
+    test_task()
 
 update_stocks_dag()
