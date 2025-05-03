@@ -1,4 +1,4 @@
-FROM apache/airflow:3.0.0
+FROM apache/airflow:2.12.0-python3.12
 
 ARG AIRFLOW_USER_HOME=/opt/airflow
 
@@ -6,17 +6,17 @@ ADD requirements.txt .
 ADD .env .
 
 RUN pip install --upgrade pip && pip install apache-airflow[postgres,auth]==${AIRFLOW_VERSION} -r requirements.txt
-
-USER root
-# RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-RUN apt update -y && apt install -y patch patchutils
-
-RUN set -ex; \
-    cd /home/airflow/.local/lib/python3.12/site-packages/airflow; \
-    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49721.patch \
-    | filterdiff -p1 -i 'airflow-core/src/airflow/*' | patch -p4 -u --verbose; \
-    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49581.patch \
-    | filterdiff -p1 -i 'providers/fab/src/airflow/*' | patch -p5 -u --verbose
-
-USER airflow
+#
+#USER root
+## RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+#
+#RUN apt update -y && apt install -y patch patchutils
+#
+#RUN set -ex; \
+#    cd /home/airflow/.local/lib/python3.12/site-packages/airflow; \
+#    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49721.patch \
+#    | filterdiff -p1 -i 'airflow-core/src/airflow/*' | patch -p4 -u --verbose; \
+#    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49581.patch \
+#    | filterdiff -p1 -i 'providers/fab/src/airflow/*' | patch -p5 -u --verbose
+#
+#USER airflow
