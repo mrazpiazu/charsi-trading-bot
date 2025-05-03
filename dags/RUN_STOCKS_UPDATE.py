@@ -1,5 +1,5 @@
 import datetime
-from airflow.sdk import dag, task
+from airflow.decorators import dag, task
 from airflow.operators.python import get_current_context
 import logging
 
