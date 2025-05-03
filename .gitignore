@@ -10,6 +10,11 @@
 .venv
 
 postgresql
+airflow-postgresql
+airflow_config
+airflow_logs
+airflow_plugins
+dags/utils
 
 # Local db
 *.sqlite
