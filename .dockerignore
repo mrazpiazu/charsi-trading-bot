@@ -6,6 +6,7 @@ airflow-postgresql
 airflow_config
 airflow_logs
 airflow_plugins
+dags/__pycache__
 .gitignore
 .git
 __pycache__
