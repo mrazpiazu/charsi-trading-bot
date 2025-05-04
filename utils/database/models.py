@@ -1,5 +1,4 @@
-from marshmallow.fields import Boolean
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime, timezone
 
