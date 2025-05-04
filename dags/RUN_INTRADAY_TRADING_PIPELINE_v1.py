@@ -37,22 +37,22 @@ def intraday_trading_pipeline_dag():
 
     backfill_task = run_backfill_data_task()
 
-    def create_trading_task_group(symbol: str):
-
-        @task_group(group_id=f"trading_task_group_{symbol.replace('.', '_')}")
-        def trading_group():
-
-            @task(task_id=f"run_technical_analysis_{symbol}")
-            def run_technical_analysis_task():
-                context = get_current_context()
-                run_technical_analysis_sql(context["data_interval_start"], context["data_interval_end"], symbol)
-
-            run_technical_analysis_task()
-
-        return trading_group()
-
-    for symbol in symbol_items_list:
-        tg = create_trading_task_group(symbol)
-        backfill_task >> tg
+    # def create_trading_task_group(symbol: str):
+    #
+    #     @task_group(group_id=f"trading_task_group_{symbol.replace('.', '_')}")
+    #     def trading_group():
+    #
+    #         @task(task_id=f"run_technical_analysis_{symbol}")
+    #         def run_technical_analysis_task():
+    #             context = get_current_context()
+    #             run_technical_analysis_sql(context["data_interval_start"], context["data_interval_end"], symbol)
+    #
+    #         run_technical_analysis_task()
+    #
+    #     return trading_group()
+    #
+    # for symbol in symbol_items_list:
+    #     tg = create_trading_task_group(symbol)
+    #     backfill_task >> tg
 
 intraday_trading_pipeline_dag()
