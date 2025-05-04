@@ -7,7 +7,7 @@ WITH indicators AS (
   FROM stock_bars
   WHERE
     created_at <= :end_date
-  ORDER BY creat_at desc
+  ORDER BY created_at desc
   LIMIT 26
 ),
 -- RSI (14)
