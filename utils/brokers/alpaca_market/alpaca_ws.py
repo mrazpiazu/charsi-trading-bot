@@ -34,7 +34,8 @@ def store_bar_sync(bar):
             low=bar['l'],
             volume=bar['v'],
             number_trades=bar['n'],
-            volume_weighted_average_price=bar['vw']
+            volume_weighted_average_price=bar['vw'],
+            is_imputed=False,
         )
         session.merge(new_bar)
         session.commit()

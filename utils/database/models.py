@@ -24,7 +24,7 @@ class StockBar(Base):
     volume = Column(Float)
     number_trades = Column(Integer)
     volume_weighted_average_price = Column(Float)
-    is_imputed = Boolean(default=False)
+    is_imputed = Boolean()
 
 
 class StockIndicator(Base):
