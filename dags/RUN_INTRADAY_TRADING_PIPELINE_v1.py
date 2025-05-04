@@ -30,36 +30,29 @@ def intraday_trading_pipeline_dag():
 
     symbol_items_list = load_stock_table_list(group_by="alphabetical")
 
-    task_id_backfill = f"run_backfill_symbol_data"
-
-    @task(task_id=task_id_backfill)
+    @task(task_id="run_backfill_symbol_data")
     def run_backfill_data_task():
         context = get_current_context()
-
         backfill_stock_data(context["data_interval_start"], context["data_interval_end"])
 
     backfill_task = run_backfill_data_task()
 
-    trading_task_groups = []
+    def create_trading_task_group(symbol: str):
 
-    for symbol_item in symbol_items_list:
-        group_id = f"trading_task_group_{symbol_item.replace('.', '_')}"
-        task_id_technical_analysis = f"run_technical_analysis_{symbol_item}"
+        @task_group(group_id=f"trading_task_group_{symbol.replace('.', '_')}")
+        def trading_group():
 
-        @task_group(group_id=group_id)
-        def trading_task_group(symbol=symbol_item):
-
-            @task(task_id=task_id_technical_analysis)
-            def run_technical_analysis_task(symbol=symbol_item):
+            @task(task_id=f"run_technical_analysis_{symbol}")
+            def run_technical_analysis_task():
                 context = get_current_context()
-
                 run_technical_analysis_sql(context["data_interval_start"], context["data_interval_end"], symbol)
 
-            run_technical_analysis_task(symbol=symbol_item)
+            run_technical_analysis_task()
 
-        trading_task_group = trading_task_group(symbol=symbol_item)
-        trading_task_groups.append(trading_task_group)
+        return trading_group()
 
-    backfill_task >> trading_task_groups
+    for symbol in symbol_items_list:
+        tg = create_trading_task_group(symbol)
+        backfill_task >> tg
 
 intraday_trading_pipeline_dag()
