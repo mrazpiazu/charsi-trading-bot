@@ -1,5 +1,6 @@
 import logging
-from sqlalchemy import text
+from sqlalchemy import text, insert, select, distinct
+from sqlalchemy.sql import exists
 import os
 from datetime import datetime as dt
 
@@ -83,25 +84,21 @@ def load_stock_starting_by(starting_letter):
         session.close()
 
 
-def update_stocks():
+def insert_new_stocks():
     """
     Inserts distinct symbols from StockBar into Stock table
     Returns:
     """
 
-    distinctive_symbols = get_active_symbols()
-    query = session.query(Stock).filter(Stock.symbol.in_(distinctive_symbols))
-    existing_symbols = query.all()
-    existing_symbols_set = {symbol.symbol for symbol in existing_symbols}
-    new_symbols = set(distinctive_symbols) - existing_symbols_set
-    for symbol in new_symbols:
-        try:
-            new_stock = Stock(symbol=symbol)
-            session.add(new_stock)
-            session.commit()
-        except Exception as e:
-            logger.error(f"Error inserting symbol {symbol} into Stock table: {e}")
-            session.rollback()
+    stmt = insert(Stock).from_select(
+        ['symbol'],
+        select(distinct(StockBar.symbol)).where(
+            ~StockBar.symbol.in_(select(Stock.symbol).scalar_subquery())
+        )
+    )
+
+    session.execute(stmt)
+    session.commit()
 
 
 def backfill_symbol_data(start_time, end_time, symbol_item):
