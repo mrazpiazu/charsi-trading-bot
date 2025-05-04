@@ -14,19 +14,8 @@ from utils.technical_analysis.indicators import *
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-STOCK_SYMBOLS = ["TSLA", "AAAPL", "GOOGL", "AMZN", "MSFT"]
-FOREX_ITEMS = ["EUR/USD", "GBP/USD", "USD/JPY"]
 
-def heartbeat():
-    while True:
-        with open("/tmp/heartbeat.txt", "w") as f:
-            f.write(str(time.time()))
-        time.sleep(5)
-
-
-def run_stock_data():
-
-    threading.Thread(target=heartbeat, daemon=True).start()
+def get_stock_data(start_time, end_time, stock_symbols: list):
 
     try:
 
@@ -37,34 +26,13 @@ def run_stock_data():
         )
 
         request_params = StockBarsRequest(
-            symbol_or_symbols=STOCK_SYMBOLS,
-            timeframe=TimeFrame.Hour,
-            start=dt.strftime(dt.now(datetime.timezone.utc) - timedelta(hours=24), '%Y-%m-%dT%H:%M:%S.%fZ')
+            symbol_or_symbols=stock_symbols,
+            timeframe=TimeFrame.Minute,
+            start=dt.strftime(start_time - timedelta(minutes=30), '%Y-%m-%dT%H:%M:%S.%fZ'),
+            end=dt.strftime(end_time, '%Y-%m-%dT%H:%M:%S.%fZ'),
         )
 
         bars = client.get_stock_bars(request_params)
-
-        df = bars.df
-
-        # Extract datetime from multiindex
-        df.reset_index(inplace=True)
-
-        df_indicators_total = pd.DataFrame()
-
-        for symbol in STOCK_SYMBOLS:
-            df_indicators = df[df['symbol'] == symbol]
-            rsi = calculate_rsi(df_indicators, period=14)
-            smna = calculate_sma(df_indicators, period=14)
-            ema = calculate_ema(df_indicators, period=14)
-            macd = calculate_macd(df_indicators, short_window=12, long_window=26, signal_window=9)
-            df_indicators['RSI'] = rsi
-            df_indicators['SMA'] = smna
-            df_indicators['EMA'] = ema
-            df_indicators['MACD'] = macd['MACD']
-            df_indicators['Signal'] = macd['Signal']
-            df_indicators['MACD_Hist'] = macd['MACD'] - macd['Signal']
-
-            df_indicators_total = pd.concat([df_indicators_total, df_indicators], ignore_index=True)
 
         return
 
@@ -76,4 +44,9 @@ def run_stock_data():
 
 
 if __name__ == "__main__":
-    run_stock_data()
+
+    from utils.database.functions import load_stock_table_list
+
+    symbols = load_stock_table_list()
+
+    get_stock_data()

@@ -1,3 +1,4 @@
+from marshmallow.fields import Boolean
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float
 from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime, timezone
@@ -24,6 +25,7 @@ class StockBar(Base):
     volume = Column(Float)
     number_trades = Column(Integer)
     volume_weighted_average_price = Column(Float)
+    is_imputed = Boolean(default=False)
 
 
 class StockIndicator(Base):

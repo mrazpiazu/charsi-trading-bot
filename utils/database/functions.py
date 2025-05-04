@@ -101,32 +101,26 @@ def insert_new_stocks():
     session.commit()
 
 
-def backfill_symbol_data(start_time, end_time, symbol_item):
+def backfill_stock_data(start_time, end_time):
     """
     Backfill data for a specific symbol.
     """
-
-    symbols_list = load_stock_starting_by(symbol_item)
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     with open(f"{current_dir}/stock_bar_backfill.sql", "r") as file:
         sql_query = text(file.read())
 
-    for symbol in symbols_list:
-        logger.info(f"Backfilling data for symbol: {symbol}")
-
-        try:
-            session.execute(sql_query, {
-                "symbol": symbol,
-                "start_time": start_time,
-                "end_time": end_time
-            })
-            session.commit()
-        except Exception as e:
-            logger.error(f"Error backfilling symbol data: {e}")
-            session.rollback()
-            raise(e)
+    try:
+        session.execute(sql_query, {
+            "start_time": start_time,
+            "end_time": end_time
+        })
+        session.commit()
+    except Exception as e:
+        logger.error(f"Error backfilling symbol data: {e}")
+        session.rollback()
+        raise(e)
 
 
 if __name__ == "__main__":
