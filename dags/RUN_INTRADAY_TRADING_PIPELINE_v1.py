@@ -36,6 +36,11 @@ def intraday_trading_pipeline_dag():
         backfill_stock_data(context["data_interval_start"], context["data_interval_end"])
 
     backfill_task = run_backfill_data_task()
+    #
+    # @task(task_id="run_technical_analysis")
+    # def run_technical_analysis_task():
+    #     context = get_current_context()
+    #     run_technical_analysis_sql(context["data_interval_start"], context["data_interval_end"])
 
     # def create_trading_task_group(symbol: str):
     #

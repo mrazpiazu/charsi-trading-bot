@@ -5,9 +5,7 @@ WITH indicators AS (
     LAG(high) OVER (PARTITION BY symbol ORDER BY created_at) AS prev_high,
     LAG(low) OVER (PARTITION BY symbol ORDER BY created_at) AS prev_low
   FROM stock_bars
-  WHERE
-    created_at BETWEEN ':start_date' AND ':end_date' AND
-    symbol = ':symbol'
+  WHERE created_at BETWEEN :start_date AND :end_date
 ),
 -- RSI (14)
 rsi_step AS (
