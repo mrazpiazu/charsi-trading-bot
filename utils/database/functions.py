@@ -106,6 +106,8 @@ def backfill_stock_data(start_time, end_time):
     Backfill data for a specific symbol.
     """
 
+    logger.info(f"Backfilling data for symbols from {start_time} to {end_time}")
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     with open(f"{current_dir}/stock_bar_backfill.sql", "r") as file:
@@ -117,6 +119,7 @@ def backfill_stock_data(start_time, end_time):
             "end_time": end_time
         })
         session.commit()
+        logger.info(f"Backfilled data for symbols from {start_time} to {end_time}")
     except Exception as e:
         logger.error(f"Error backfilling symbol data: {e}")
         session.rollback()
