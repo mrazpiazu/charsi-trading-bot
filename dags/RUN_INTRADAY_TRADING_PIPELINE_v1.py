@@ -38,7 +38,7 @@ def intraday_trading_pipeline_dag():
 
         backfill_stock_data(context["data_interval_start"], context["data_interval_end"])
 
-    run_backfill_data_task()
+    backfill_task = run_backfill_data_task()
 
     for symbol_item in symbol_items_list:
         group_id = f"trading_task_group_{symbol_item.replace('.', '_')}"
@@ -55,6 +55,6 @@ def intraday_trading_pipeline_dag():
 
             run_technical_analysis_task(symbol=symbol_item)
 
-        run_backfill_data_task() >> trading_task_group(symbol=symbol_item)
+        backfill_task >> trading_task_group(symbol=symbol_item)
 
 intraday_trading_pipeline_dag()
