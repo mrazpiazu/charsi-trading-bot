@@ -42,7 +42,6 @@ class StockIndicator(Base):
     macd_signal = Column(Float)
     sma_20 = Column(Float)
     atr_14 = Column(Float)
-    atr = Column(Float)  # Optional/legacy
     adx_14 = Column(Float)
 
     # Oscillators

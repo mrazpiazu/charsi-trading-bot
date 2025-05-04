@@ -159,7 +159,7 @@ obv_final AS (
   FROM obv_calc
 )
 -- Final insert
-INSERT INTO technical_indicators (
+INSERT INTO bar_indicators (
   id,
   created_at,
   symbol,
