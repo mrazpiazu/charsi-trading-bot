@@ -13,8 +13,12 @@ get_logger_config(logging)
 
 @dag(
     dag_id="intraday_trading_pipeline_dag_v1",
-    start_date=datetime.datetime(2025, 5, 1),
-    schedule='*/30 * * * *',
+    start_date=datetime.datetime(2025, 5, 5),
+    schedule=[
+        "30 12 * * *",    # 12:30
+        "0,30 13-18 * * *",  # cada 30 min de 13:00 a 18:30
+        "0 19 * * *"      # 19:00
+    ],
     catchup=True,
     max_active_runs=1,
     default_args={
