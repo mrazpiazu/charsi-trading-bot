@@ -69,3 +69,27 @@ class StockIndicator(Base):
 
     # On-Balance Volume
     obv = Column(Float)
+
+
+class StockOrder(Base):
+    __tablename__ = 'stock_orders'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    symbol = Column(String(10))
+    order_id = Column(String(50))
+    order_type = Column(String(20))  # e.g., "buy", "sell"
+    quantity = Column(Integer)
+    price = Column(Float)
+    status = Column(String(20))  # e.g., "completed", "pending", "canceled"
+
+
+class StockTrade(Base):
+    __tablename__ = 'stock_trades'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    symbol = Column(String(10))
+    trade_id = Column(String(50))
+    order_id = Column(String(50))
+    quantity = Column(Integer)
+    price = Column(Float)
+    profit_loss = Column(Float)  # Profit or loss from the trade

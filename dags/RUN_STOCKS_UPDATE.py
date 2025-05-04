@@ -11,8 +11,8 @@ get_logger_config(logging)
 
 
 @dag(
-    start_date=datetime.datetime(2025, 5, 1),
-    schedule='*/5 * * * *',
+    start_date=datetime.datetime(2025, 5, 5),
+    schedule='*/5 12-19 * * *',
     catchup=False,
     max_active_runs=1,
     default_args={
@@ -20,7 +20,7 @@ get_logger_config(logging)
         'retries': 1,
         'retry_delay': datetime.timedelta(minutes=5),
         'email_on_failure': False,
-        'email_on_retry': False,
+        'email_on_retry': False
     },
     tags=["stocks"]
 )
