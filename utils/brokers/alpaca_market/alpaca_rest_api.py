@@ -61,7 +61,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
             session.execute(delete_stmt)
             session.commit()
 
-        logger.info(f"Loading {len(keys_to_delete)} bars into DB")
+        logger.info(f"Loading {df_bar.shape[0]} bars into DB")
         session.bulk_insert_mappings(
             StockBar,
             [
