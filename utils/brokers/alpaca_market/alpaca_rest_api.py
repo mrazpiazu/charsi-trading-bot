@@ -33,7 +33,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
         request_params = StockBarsRequest(
             symbol_or_symbols=stock_symbols,
             timeframe=TimeFrame.Minute,
-            start=dt.strftime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ'),
+            start=dt.strftime(start_time + timedelta(minutes=1), '%Y-%m-%dT%H:%M:%S.%fZ'),
             end=dt.strftime(end_time , '%Y-%m-%dT%H:%M:%S.%fZ'),
         )
 
@@ -47,7 +47,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
         CHUNK_SIZE = 1000
 
         keys_to_delete = session.query(StockBar.symbol, StockBar.created_at).filter(
-            StockBar.created_at >= start_time,
+            StockBar.created_at > start_time,
             StockBar.created_at < end_time,
             StockBar.symbol.in_(stock_symbols)
         ).all()
