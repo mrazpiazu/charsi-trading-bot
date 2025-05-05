@@ -116,7 +116,7 @@ def run_backfill_fact_stock_bars(start_time, end_time):
     try:
 
         logger.info("Deleting existing backfilled data in StockBars table...")
-        delete_stmt = Stock.__table__.delete().where(
+        delete_stmt = StockBar.__table__.delete().where(
             StockBar.created_at >= start_time,
             StockBar.created_at < end_time,
             StockBar.is_imputed == True
