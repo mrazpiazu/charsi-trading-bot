@@ -75,6 +75,5 @@ if __name__ == "__main__":
 
     run_stream()
 
-    # websocket(Alpaca.Markets) > database > Indicators > Filtro ATR,RSI... > model(ChatGPT) > broker(Alpaca.Markets)
 
 

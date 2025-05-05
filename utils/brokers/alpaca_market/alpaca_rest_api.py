@@ -20,8 +20,8 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
     try:
 
         client = StockHistoricalDataClient(
-            api_key=os.getenv("APCA_API_KEY_ID"),
-            secret_key=os.getenv("APCA_API_SECRET_KEY"),
+            api_key=os.getenv("ALPACA_API_KEY_ID"),
+            secret_key=os.getenv("ALPACA_API_SECRET_KEY"),
             sandbox=False
         )
 
@@ -33,6 +33,33 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
         )
 
         bars = client.get_stock_bars(request_params)
+
+        df_bar = bars.df
+        df_bar.reset_index(inplace=True)
+
+        session = SessionLocal()
+
+        for index, row in df_bar.iterrows():
+            try:
+                new_bar = StockBar(
+                    created_at=row['timestamp'],
+                    symbol=row['symbol'],
+                    open=float(row['open']),
+                    close=float(row['close']),
+                    high=float(row['high']),
+                    low=float(row['low']),
+                    volume=float(row['volume']),
+                    number_trades=int(row['trade_count']),
+                    volume_weighted_average_price=float(row['vwap']),
+                    is_imputed=False
+                )
+                session.merge(new_bar)
+                session.commit()
+            except Exception as e:
+                logging.exception(f"Error storing bar in DB: {e}")
+                session.rollback()
+            finally:
+                session.close()
 
         return
 
@@ -46,7 +73,15 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 if __name__ == "__main__":
 
     from utils.database.functions import load_stock_table_list
+    from utils.database.db import *
+    from utils.database.models import *
 
-    symbols = load_stock_table_list()
+    session = SessionLocal()
 
-    get_stock_data()
+    start_time = dt(2025, 4, 30, 00, 0, 0)
+    end_time = dt(2025, 5, 5, 14, 15, 0)
+
+    symbols = session.query(StockBar).distinct(StockBar.symbol).all()
+    symbols_list = [symbol.symbol for symbol in symbols][1:]
+
+    get_stock_data(start_time, end_time, symbols_list)

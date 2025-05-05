@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy import text, insert, select, distinct
+from sqlalchemy import text, insert, select, distinct, func
 from sqlalchemy.sql import exists
 import os
 from datetime import datetime as dt
@@ -7,6 +7,7 @@ from datetime import datetime as dt
 from utils.database.db import SessionLocal
 from utils.database.models import StockBar, Stock, StockBarAggregate
 from utils.logger.logger import get_logger_config
+from utils.brokers.alpaca_market.alpaca_rest_api import get_stock_data
 
 logger = logging.getLogger("db_functions")
 get_logger_config(logging)
@@ -138,6 +139,42 @@ def run_backfill_fact_stock_bars(start_time, end_time):
         raise
 
 
+def run_backfill_fact_stock_bars_api(start_time, end_time):
+
+    logger.info(f"Backfilling data for symbols from {start_time} to {end_time}")
+
+    expected_minutes = int((end_time - start_time).total_seconds() // 60)
+
+    symbols_query = text(f"""
+        WITH counted_bars AS (
+            SELECT
+                symbol,
+                COUNT(*) AS actual_count
+            FROM fact_stock_bars
+            WHERE created_at >= :start_time
+              AND created_at < :end_time
+            GROUP BY symbol
+        )
+        SELECT ds.symbol
+        FROM dim_stocks ds
+        LEFT JOIN counted_bars cb ON ds.symbol = cb.symbol
+        WHERE COALESCE(cb.actual_count, 0) < :expected_minutes;
+    """)
+
+    result = session.execute(symbols_query,
+                             {
+                                "start_time": start_time,
+                                "end_time": end_time,
+                                "expected_minutes": expected_minutes
+                             }).all()
+    symbols_list = [row.symbol for row in result]
+
+    logger.info(f"Reloading {len(symbols_list)} symbols from Alpaca API")
+
+    get_stock_data(start_time, end_time, symbols_list)
+    logger.info(f"Reloaded {len(symbols_list)} symbols from Alpaca API")
+
+
 def run_agg_stock_bars(start_time, end_time, aggregation):
     """
     Aggregate stock data.
@@ -182,4 +219,4 @@ if __name__ == "__main__":
     start_time = dt(2025, 4, 1, 0, 0)
     end_time = dt(2025, 5, 5, 23, 59)
 
-    run_backfill_fact_stock_bars(start_time, end_time)
+    run_backfill_fact_stock_bars_api(start_time, end_time)

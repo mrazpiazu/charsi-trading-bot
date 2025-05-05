@@ -40,7 +40,7 @@ def intraday_trading_pipeline_dag():
         if end_time - start_time > datetime.timedelta(minutes=15):
             start_time = end_time - datetime.timedelta(minutes=15)
 
-        run_backfill_fact_stock_bars(start_time, end_time)
+        run_backfill_fact_stock_bars_api(start_time, end_time)
 
     backfill_task = run_backfill_data_task()
 
