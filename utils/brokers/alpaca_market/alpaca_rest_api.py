@@ -57,6 +57,13 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
                     volume_weighted_average_price=float(row['vwap']),
                     is_imputed=False
                 )
+
+                delete_query = session.query(StockBar).filter(
+                    StockBar.created_at == row['timestamp'],
+                    StockBar.symbol == row['symbol']
+                ).delete()
+                session.execute(delete_query)
+
                 session.merge(new_bar)
                 session.commit()
             except Exception as e:
