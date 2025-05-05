@@ -46,7 +46,11 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
         CHUNK_SIZE = 1000
 
-        keys_to_delete = [(row['timestamp'], row['symbol']) for _, row in df_bar.iterrows()]
+        keys_to_delete = session.query(StockBar.symbol, StockBar.created_at).filter(
+            StockBar.created_at >= start_time,
+            StockBar.created_at < end_time,
+            StockBar.is_imputed == True
+        ).all()
 
         logger.info(f"Deleting {len(keys_to_delete)} bars from DB")
         for i in range(0, len(keys_to_delete), CHUNK_SIZE):
