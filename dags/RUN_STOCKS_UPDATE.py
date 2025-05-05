@@ -31,4 +31,6 @@ def update_stocks_dag():
     def insert_new_stocks_task():
         insert_new_stocks()
 
+    insert_new_stocks_task()
+
 update_stocks_dag()
