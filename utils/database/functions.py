@@ -123,7 +123,7 @@ def run_backfill_fact_stock_bars(start_time, end_time):
     except Exception as e:
         logger.error(f"Error backfilling symbol data: {e}")
         session.rollback()
-        raise(e)
+        raise
 
 
 def run_agg_stock_bars(start_time, end_time, aggregation):
