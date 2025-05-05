@@ -44,12 +44,17 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
         logger.info(f"Loading {df_bar.shape[0]} bars from Alpaca API")
 
+        CHUNK_SIZE = 500
+
         keys_to_delete = [(row['timestamp'], row['symbol']) for _, row in df_bar.iterrows()]
 
-        delete_stmt = delete(StockBar).where(
-            tuple_(StockBar.created_at, StockBar.symbol).in_(keys_to_delete)
-        )
-        session.execute(delete_stmt)
+        for i in range(0, len(keys_to_delete), CHUNK_SIZE):
+            chunk = keys_to_delete[i:i + CHUNK_SIZE]
+            delete_stmt = delete(StockBar).where(
+                tuple_(StockBar.created_at, StockBar.symbol).in_(chunk)
+            )
+            session.execute(delete_stmt)
+            session.commit()
 
         new_bars = [
             StockBar(
