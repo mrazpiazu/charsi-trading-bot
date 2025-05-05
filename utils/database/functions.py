@@ -152,7 +152,8 @@ def run_backfill_fact_stock_bars_api(start_time, end_time):
                 COUNT(*) AS actual_count
             FROM fact_stock_bars
             WHERE created_at >= :start_time
-              AND created_at < :end_time
+              AND created_at < :end_time AND
+              is_imputed = False
             GROUP BY symbol
         )
         SELECT ds.symbol
