@@ -73,14 +73,26 @@ def run_technical_analysis_sql(data_interval_start, data_interval_end):
         sql_query = text(file.read())
 
     try:
+
+        logger.info("Deleting existing data in StockBarAggregate table...")
+        delete_stmt = StockBar.__table__.delete().where(
+            StockBar.created_at >= data_interval_start,
+            StockBar.created_at < data_interval_end
+        )
+        session.execute(delete_stmt)
+        logger.info("Deleted existing data in StockBarAggregate table")
+
+        logger.info("Running technical analysis SQL query...")
         session.execute(sql_query, {
             'start_date': data_interval_start,
             'end_date': data_interval_end
         })
         session.commit()
+        logger.info(f"Technical analysis SQL query executed successfully for symbols from {data_interval_start} to {data_interval_end}")
     except Exception as e:
         logger.error(f"Error executing SQL query: {e}")
         session.rollback()
+        raise
 
 
 if __name__ == '__main__':

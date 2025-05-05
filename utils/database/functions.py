@@ -172,7 +172,7 @@ def run_agg_stock_bars(start_time, end_time, aggregation):
     except Exception as e:
         logger.error(f"Error aggregating stock data: {e}")
         session.rollback()
-        raise(e)
+        raise
 
 
 if __name__ == "__main__":
