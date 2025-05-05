@@ -48,6 +48,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
         keys_to_delete = [(row['timestamp'], row['symbol']) for _, row in df_bar.iterrows()]
 
+        logger.info(f"Deleting {len(keys_to_delete)} bars from DB")
         for i in range(0, len(keys_to_delete), CHUNK_SIZE):
             chunk = keys_to_delete[i:i + CHUNK_SIZE]
             delete_stmt = delete(StockBar).where(
@@ -72,6 +73,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
             for _, row in df_bar.iterrows()
         ]
 
+        logger.info(f"Storing {len(new_bars)} bars in DB")
         session.bulk_save_objects(new_bars)
         session.commit()
     except Exception as e:
