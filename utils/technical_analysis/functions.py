@@ -76,8 +76,7 @@ def run_technical_analysis_sql(data_interval_start, data_interval_end):
 
         logger.info("Deleting existing data in StockIndicator table...")
         delete_stmt = StockIndicator.__table__.delete().where(
-            StockIndicator.created_at >= data_interval_start,
-            StockIndicator.created_at < data_interval_end
+            StockIndicator.created_at == data_interval_end
         )
         session.execute(delete_stmt)
         session.commit()
