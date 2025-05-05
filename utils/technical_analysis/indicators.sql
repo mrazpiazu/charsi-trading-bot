@@ -6,7 +6,7 @@ WITH indicators AS (
     LAG(low) OVER (PARTITION BY symbol ORDER BY created_at) AS prev_low
   FROM agg_stock_bars
   WHERE
-    created_at < :end_date
+    created_at <= :end_date
   ORDER BY created_at desc
   LIMIT 26
 ),
