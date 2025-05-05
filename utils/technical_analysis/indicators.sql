@@ -8,7 +8,7 @@ WITH indicators AS (
   WHERE
     created_at <= :end_date
   ORDER BY created_at desc
-  LIMIT 26
+  LIMIT 100
 ),
 -- RSI (14)
 rsi_step AS (
