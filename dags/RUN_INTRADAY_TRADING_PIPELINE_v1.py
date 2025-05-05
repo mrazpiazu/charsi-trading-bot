@@ -14,7 +14,7 @@ get_logger_config(logging)
 @dag(
     dag_id="intraday_trading_pipeline_dag_v1",
     start_date=datetime.datetime(2025, 5, 5, 12),
-    schedule='*/15 12-19 * * 1-5',
+    schedule='*/15 12-18 * * 1-5',
     catchup=True,
     max_active_runs=1,
     default_args={
