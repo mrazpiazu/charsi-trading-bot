@@ -17,6 +17,8 @@ load_dotenv()
 
 def get_stock_data(start_time, end_time, stock_symbols: list):
 
+    session = SessionLocal()
+
     try:
 
         client = StockHistoricalDataClient(
