@@ -10,6 +10,7 @@ from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
 
 from utils.technical_analysis.indicators import *
+from utils.database.db import *
 
 logger = logging.getLogger(__name__)
 load_dotenv()
