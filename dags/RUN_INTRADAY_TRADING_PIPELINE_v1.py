@@ -37,8 +37,8 @@ def intraday_trading_pipeline_dag():
         start_time = context["data_interval_start"]
         end_time = context["data_interval_end"]
 
-        if end_time - start_time > datetime.timedelta(hours=1):
-            start_time = end_time - datetime.timedelta(hours=1)
+        if end_time - start_time > datetime.timedelta(minutes=15):
+            start_time = end_time - datetime.timedelta(minutes=15)
 
         run_backfill_fact_stock_bars(start_time, end_time)
 
@@ -52,8 +52,8 @@ def intraday_trading_pipeline_dag():
         start_time = context["data_interval_start"]
         end_time = context["data_interval_end"]
 
-        if end_time - start_time > datetime.timedelta(hours=1):
-            start_time = end_time - datetime.timedelta(hours=1)
+        if end_time - start_time > datetime.timedelta(minutes=15):
+            start_time = end_time - datetime.timedelta(minutes=15)
 
         run_agg_stock_bars(start_time, end_time, "15min")
 
@@ -67,8 +67,8 @@ def intraday_trading_pipeline_dag():
         start_time = context["data_interval_start"]
         end_time = context["data_interval_end"]
 
-        if end_time - start_time > datetime.timedelta(hours=1):
-            start_time = end_time - datetime.timedelta(hours=1)
+        if end_time - start_time > datetime.timedelta(minutes=15):
+            start_time = end_time - datetime.timedelta(minutes=15)
 
         run_technical_analysis_sql(start_time, end_time)
 
