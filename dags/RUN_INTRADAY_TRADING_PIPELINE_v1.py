@@ -15,7 +15,7 @@ get_logger_config(logging)
     dag_id="intraday_trading_pipeline_dag_v1",
     start_date=datetime.datetime(2025, 5, 5),
     schedule='*/15 12-19 * * *',
-    catchup=True,
+    catchup=False,
     max_active_runs=1,
     default_args={
         'owner': 'airflow',
