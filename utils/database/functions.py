@@ -115,16 +115,16 @@ def run_backfill_fact_stock_bars(start_time, end_time):
 
     try:
 
-        logger.info("Deleting existing backfilled data in StockBars table...")
+        logger.info("Deleting existing backfilled data in StockBar table...")
         delete_stmt = StockBar.__table__.delete().where(
             StockBar.created_at >= start_time,
             StockBar.created_at < end_time,
             StockBar.is_imputed == True
         )
         session.execute(delete_stmt)
-        logger.info("Deleted existing data in StockBarAggregate table")
+        logger.info("Deleted existing data in StockBar table")
 
-        logger.info("Backfilling data in StockBarAggregate table...")
+        logger.info("Backfilling data in StockBar table...")
         session.execute(sql_query, {
             "start_time": start_time,
             "end_time": end_time
