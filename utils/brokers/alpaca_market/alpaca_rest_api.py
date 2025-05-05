@@ -11,6 +11,7 @@ from alpaca.data.timeframe import TimeFrame
 
 from utils.technical_analysis.indicators import *
 from utils.database.db import *
+from utils.database.models import *
 
 logger = logging.getLogger(__name__)
 load_dotenv()
