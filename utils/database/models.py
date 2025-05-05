@@ -9,7 +9,7 @@ class Stock(Base):
     __tablename__ = 'dim_stocks'
     id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    symbol = Column(String(10), primary_key=True)
+    symbol = Column(String(10))
 
 
 class StockBar(Base):
@@ -128,8 +128,8 @@ class StockTrade(Base):
     filled_at = Column(DateTime)
 
     symbol = Column(String(10))
-    trade_id = Column(String(50), unique=True)
-    order_id = Column(String(50))  # foreign key to StockOrder if needed
+    trade_id = Column(String(50))
+    order_id = Column(String(50))
 
     quantity = Column(Integer)
     price = Column(Float)
