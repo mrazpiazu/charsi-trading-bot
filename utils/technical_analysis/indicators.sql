@@ -162,7 +162,7 @@ obv_final AS (
   FROM obv_calc
 )
 -- Final insert
-INSERT INTO bar_indicators (
+INSERT INTO agg_bar_indicators (
   id,
   created_at,
   symbol,
