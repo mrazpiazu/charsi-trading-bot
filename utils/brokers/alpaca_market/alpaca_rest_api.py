@@ -13,8 +13,10 @@ from sqlalchemy import delete, tuple_
 from utils.technical_analysis.indicators import *
 from utils.database.db import *
 from utils.database.models import *
+from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger(__name__)
+get_logger_config(logging)
 load_dotenv()
 
 
