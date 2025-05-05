@@ -21,6 +21,7 @@ get_logger_config(logging)
         'owner': 'airflow',
         'retries': 1,
         'retry_delay': datetime.timedelta(minutes=5),
+        'depend_on_past': True,
         'email_on_failure': False,
         'email_on_retry': False,
     },
