@@ -33,7 +33,14 @@ def intraday_trading_pipeline_dag():
     @task(task_id="run_backfill_fact_stock_bars")
     def run_backfill_data_task():
         context = get_current_context()
-        run_backfill_fact_stock_bars(context["data_interval_start"], context["data_interval_end"])
+
+        start_time = context["data_interval_start"]
+        end_time = context["data_interval_end"]
+
+        if end_time - start_time > datetime.timedelta(hours=1):
+            start_time = end_time - datetime.timedelta(hours=1)
+
+        run_backfill_fact_stock_bars(start_time, end_time)
 
     backfill_task = run_backfill_data_task()
 
@@ -41,7 +48,14 @@ def intraday_trading_pipeline_dag():
     @task(task_id="run_agg_stock_bars")
     def run_aggregation_data_task():
         context = get_current_context()
-        run_agg_stock_bars(context["data_interval_start"], context["data_interval_end"], "15min")
+
+        start_time = context["data_interval_start"]
+        end_time = context["data_interval_end"]
+
+        if end_time - start_time > datetime.timedelta(hours=1):
+            start_time = end_time - datetime.timedelta(hours=1)
+
+        run_agg_stock_bars(start_time, end_time, "15min")
 
     aggregation_task = run_aggregation_data_task()
 
@@ -49,7 +63,14 @@ def intraday_trading_pipeline_dag():
     @task(task_id="run_technical_analysis")
     def run_technical_analysis_task():
         context = get_current_context()
-        run_technical_analysis_sql(context["data_interval_start"], context["data_interval_end"])
+
+        start_time = context["data_interval_start"]
+        end_time = context["data_interval_end"]
+
+        if end_time - start_time > datetime.timedelta(hours=1):
+            start_time = end_time - datetime.timedelta(hours=1)
+
+        run_technical_analysis_sql(start_time, end_time)
 
     technical_analysis_task = run_technical_analysis_task()
 
