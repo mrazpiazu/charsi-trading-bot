@@ -48,7 +48,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
         keys_to_delete = session.query(StockBar.symbol, StockBar.created_at).filter(
             StockBar.created_at > start_time,
-            StockBar.created_at < end_time,
+            StockBar.created_at <= end_time,
             StockBar.symbol.in_(stock_symbols)
         ).all()
 
