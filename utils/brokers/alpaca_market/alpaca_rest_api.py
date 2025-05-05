@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
+from sqlalchemy import delete, tuple_
 
 from utils.technical_analysis.indicators import *
 from utils.database.db import *
@@ -43,40 +44,39 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
         logger.info(f"Loading {df_bar.shape[0]} bars from Alpaca API")
 
-        for index, row in df_bar.iterrows():
-            try:
-                new_bar = StockBar(
-                    created_at=row['timestamp'],
-                    symbol=row['symbol'],
-                    open=float(row['open']),
-                    close=float(row['close']),
-                    high=float(row['high']),
-                    low=float(row['low']),
-                    volume=float(row['volume']),
-                    number_trades=int(row['trade_count']),
-                    volume_weighted_average_price=float(row['vwap']),
-                    is_imputed=False
-                )
+        keys_to_delete = [(row['timestamp'], row['symbol']) for _, row in df_bar.iterrows()]
 
-                delete_query = session.query(StockBar).filter(
-                    StockBar.created_at == row['timestamp'],
-                    StockBar.symbol == row['symbol']
-                ).delete()
-                session.execute(delete_query)
+        delete_stmt = delete(StockBar).where(
+            tuple_(StockBar.created_at, StockBar.symbol).in_(keys_to_delete)
+        )
+        session.execute(delete_stmt)
 
-                session.merge(new_bar)
-                session.commit()
-            except Exception as e:
-                logging.exception(f"Error storing bar in DB: {e}")
-                session.rollback()
-            finally:
-                session.close()
+        new_bars = [
+            StockBar(
+                created_at=row['timestamp'],
+                symbol=row['symbol'],
+                open=float(row['open']),
+                close=float(row['close']),
+                high=float(row['high']),
+                low=float(row['low']),
+                volume=float(row['volume']),
+                number_trades=int(row['trade_count']),
+                volume_weighted_average_price=float(row['vwap']),
+                is_imputed=False
+            )
+            for _, row in df_bar.iterrows()
+        ]
 
-        return
-
+        session.bulk_save_objects(new_bars)
+        session.commit()
     except Exception as e:
-        logger.exception(f"Exception in main loop: {e}")
+        logging.exception(f"Error storing bar in DB: {e}")
+        session.rollback()
         raise
+    finally:
+        session.close()
+
+    return
 
 
 if __name__ == "__main__":
