@@ -33,8 +33,8 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
         request_params = StockBarsRequest(
             symbol_or_symbols=stock_symbols,
             timeframe=TimeFrame.Minute,
-            start=dt.strftime(start_time - timedelta(minutes=30), '%Y-%m-%dT%H:%M:%S.%fZ'),
-            end=dt.strftime(end_time, '%Y-%m-%dT%H:%M:%S.%fZ'),
+            start=dt.strftime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ'),
+            end=dt.strftime(end_time , '%Y-%m-%dT%H:%M:%S.%fZ'),
         )
 
         bars = client.get_stock_bars(request_params)
