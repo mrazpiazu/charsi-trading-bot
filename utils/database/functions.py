@@ -101,7 +101,7 @@ def insert_new_stocks():
     session.commit()
 
 
-def backfill_stock_data(start_time, end_time):
+def run_backfill_fact_stock_bars(start_time, end_time):
     """
     Backfill data for a specific symbol.
     """
@@ -126,7 +126,7 @@ def backfill_stock_data(start_time, end_time):
         raise(e)
 
 
-def aggregate_stock_data(start_time, end_time, aggregation):
+def run_agg_stock_bars(start_time, end_time, aggregation):
     """
     Aggregate stock data.
     """

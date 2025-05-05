@@ -30,18 +30,18 @@ def intraday_trading_pipeline_dag():
 
     symbol_items_list = load_stock_table_list(group_by="alphabetical")
 
-    @task(task_id="run_backfill_symbol_data")
+    @task(task_id="run_backfill_fact_stock_bars")
     def run_backfill_data_task():
         context = get_current_context()
-        backfill_stock_data(context["data_interval_start"], context["data_interval_end"])
+        run_backfill_fact_stock_bars(context["data_interval_start"], context["data_interval_end"])
 
     backfill_task = run_backfill_data_task()
 
 
-    @task(task_id="run_aggregation_symbol_data")
+    @task(task_id="run_agg_stock_bars")
     def run_aggregation_data_task():
         context = get_current_context()
-        aggregate_stock_data(context["data_interval_start"], context["data_interval_end"], "15min")
+        run_agg_stock_bars(context["data_interval_start"], context["data_interval_end"], "15min")
 
     aggregation_task = run_aggregation_data_task()
 
