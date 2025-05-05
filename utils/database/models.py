@@ -14,7 +14,7 @@ class Stock(Base):
 
 class StockBar(Base):
     __tablename__ = 'fact_stock_bars'
-    id = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     symbol = Column(String(10))
     open = Column(Float)
@@ -29,7 +29,7 @@ class StockBar(Base):
 
 class StockBarAggregate(Base):
     __tablename__ = 'agg_stock_bars'
-    id = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     symbol = Column(String(10))
     open = Column(Float)
@@ -45,7 +45,7 @@ class StockBarAggregate(Base):
 class StockIndicator(Base):
     __tablename__ = 'agg_bar_indicators'
 
-    id = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     symbol = Column(String(10))
 
@@ -88,7 +88,7 @@ class StockIndicator(Base):
 
 class StockOrder(Base):
     __tablename__ = 'fact_stock_orders'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     submitted_at = Column(DateTime)
     filled_at = Column(DateTime)
@@ -123,7 +123,7 @@ class StockOrder(Base):
 
 class StockTrade(Base):
     __tablename__ = 'fact_stock_trades'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     filled_at = Column(DateTime)
 

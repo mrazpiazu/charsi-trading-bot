@@ -5,7 +5,7 @@ import os
 
 from utils.database.db import SessionLocal
 from utils.database.functions import load_stock_starting_by
-from utils.database.models import StockBar
+from utils.database.models import StockBar, StockBarAggregate
 from utils.logger.logger import get_logger_config
 from utils.technical_analysis.indicators import *
 
@@ -75,7 +75,7 @@ def run_technical_analysis_sql(data_interval_start, data_interval_end):
     try:
 
         logger.info("Deleting existing data in StockBarAggregate table...")
-        delete_stmt = StockBar.__table__.delete().where(
+        delete_stmt = StockBarAggregate.__table__.delete().where(
             StockBar.created_at >= data_interval_start,
             StockBar.created_at < data_interval_end
         )
