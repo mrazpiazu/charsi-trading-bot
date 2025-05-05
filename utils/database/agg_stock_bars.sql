@@ -9,13 +9,13 @@ insert into agg_stock_bars (
 select
     :end_time as created_at,
     symbol,
-    percentile_cont(0.5) within group (order by open) as open,
-    percentile_cont(0.5) within group (order by close) as close,
-    percentile_cont(0.5) within group (order by high) as high,
-    percentile_cont(0.5) within group (order by low) as low,
-    percentile_cont(0.5) within group (order by volume) as volume,
-    percentile_cont(0.5) within group (order by number_trades) as number_trades,
-    percentile_cont(0.5) within group (order by volume_weighted_average_price) as volume_weighted_average_price,
+    round(percentile_cont(0.5) within group (order by open), 4) as open,
+    round(percentile_cont(0.5) within group (order by close), 4) as close,
+    round(percentile_cont(0.5) within group (order by high), 4) as high,
+    round(percentile_cont(0.5) within group (order by low), 4) as low,
+    round(percentile_cont(0.5) within group (order by volume), 4) as volume,
+    round(percentile_cont(0.5) within group (order by number_trades), 4) as number_trades,
+    round(percentile_cont(0.5) within group (order by volume_weighted_average_price), 4) as volume_weighted_average_price,
     :aggregation
 from raw_bars
 group by symbol;
