@@ -52,6 +52,8 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
             StockBar.symbol.in_(stock_symbols)
         ).all()
 
+        keys_to_delete = [(bar.created_at, bar.symbol) for bar in keys_to_delete]
+
         logger.info(f"Deleting {len(keys_to_delete)} bars from DB")
         for i in range(0, len(keys_to_delete), CHUNK_SIZE):
             chunk = keys_to_delete[i:i + CHUNK_SIZE]
