@@ -41,7 +41,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
         df_bar = bars.df
         df_bar.reset_index(inplace=True)
 
-        session = SessionLocal()
+        logger.info(f"Loading {df_bar.shape[0]} bars from Alpaca API")
 
         for index, row in df_bar.iterrows():
             try:
