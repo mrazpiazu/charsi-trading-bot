@@ -154,5 +154,8 @@ def run_agg_stock_bars(start_time, end_time, aggregation):
 
 
 if __name__ == "__main__":
-    symbols = get_active_symbols()
-    print(symbols)
+
+    start_time = dt(2025, 4, 1, 0, 0)
+    end_time = dt(2025, 5, 5, 23, 59)
+
+    run_backfill_fact_stock_bars(start_time, end_time)
