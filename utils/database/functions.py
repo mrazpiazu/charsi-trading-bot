@@ -5,7 +5,7 @@ import os
 from datetime import datetime as dt
 
 from utils.database.db import SessionLocal
-from utils.database.models import StockBar, Stock
+from utils.database.models import StockBar, Stock, StockBarAggregate
 from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger("db_functions")
@@ -114,6 +114,17 @@ def run_backfill_fact_stock_bars(start_time, end_time):
         sql_query = text(file.read())
 
     try:
+
+        logger.info("Deleting existing backfilled data in StockBars table...")
+        delete_stmt = Stock.__table__.delete().where(
+            StockBar.created_at >= start_time,
+            StockBar.created_at < end_time,
+            StockBar.is_imputed == True
+        )
+        session.execute(delete_stmt)
+        logger.info("Deleted existing data in StockBarAggregate table")
+
+        logger.info("Backfilling data in StockBarAggregate table...")
         session.execute(sql_query, {
             "start_time": start_time,
             "end_time": end_time
@@ -139,6 +150,17 @@ def run_agg_stock_bars(start_time, end_time, aggregation):
         sql_query = text(file.read())
 
     try:
+
+        logger.info("Deleting existing aggregated data in StockBarAggregate table...")
+        delete_stmt = StockBarAggregate.__table__.delete().where(
+            StockBarAggregate.created_at >= start_time,
+            StockBarAggregate.created_at < end_time,
+            StockBarAggregate.aggregation == aggregation
+        )
+        session.execute(delete_stmt)
+        logger.info("Deleted existing data in StockBarAggregate table")
+
+        logger.info("Aggregating data in StockBarAggregate table...")
         session.execute(sql_query,
                         {
                             "start_time": start_time,
