@@ -44,7 +44,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
         logger.info(f"Loading {df_bar.shape[0]} bars from Alpaca API")
 
-        CHUNK_SIZE = 500
+        CHUNK_SIZE = 1000
 
         keys_to_delete = [(row['timestamp'], row['symbol']) for _, row in df_bar.iterrows()]
 
@@ -57,24 +57,25 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
             session.execute(delete_stmt)
             session.commit()
 
-        new_bars = [
-            StockBar(
-                created_at=row['timestamp'],
-                symbol=row['symbol'],
-                open=float(row['open']),
-                close=float(row['close']),
-                high=float(row['high']),
-                low=float(row['low']),
-                volume=float(row['volume']),
-                number_trades=int(row['trade_count']),
-                volume_weighted_average_price=float(row['vwap']),
-                is_imputed=False
-            )
-            for _, row in df_bar.iterrows()
-        ]
-
-        logger.info(f"Storing {len(new_bars)} bars in DB")
-        session.bulk_save_objects(new_bars)
+        logger.info(f"Loading {len(keys_to_delete)} bars into DB")
+        session.bulk_insert_mappings(
+            StockBar,
+            [
+                {
+                    "created_at": row["timestamp"],
+                    "symbol": row["symbol"],
+                    "open": float(row["open"]),
+                    "close": float(row["close"]),
+                    "high": float(row["high"]),
+                    "low": float(row["low"]),
+                    "volume": float(row["volume"]),
+                    "number_trades": int(row["trade_count"]),
+                    "volume_weighted_average_price": float(row["vwap"]),
+                    "is_imputed": False,
+                }
+                for _, row in df_bar.iterrows()
+            ]
+        )
         session.commit()
     except Exception as e:
         logging.exception(f"Error storing bar in DB: {e}")
