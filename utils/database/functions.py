@@ -110,7 +110,7 @@ def backfill_stock_data(start_time, end_time):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    with open(f"{current_dir}/stock_bar_backfill.sql", "r") as file:
+    with open(f"{current_dir}/backfill_fact_stock_bars.sql", "r") as file:
         sql_query = text(file.read())
 
     try:
@@ -122,6 +122,33 @@ def backfill_stock_data(start_time, end_time):
         logger.info(f"Backfilled data for symbols from {start_time} to {end_time}")
     except Exception as e:
         logger.error(f"Error backfilling symbol data: {e}")
+        session.rollback()
+        raise(e)
+
+
+def aggregate_stock_data(start_time, end_time, aggregation):
+    """
+    Aggregate stock data.
+    """
+
+    logger.info("Aggregating stock data...")
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    with open(f"{current_dir}/agg_stock_bars.sql", "r") as file:
+        sql_query = text(file.read())
+
+    try:
+        session.execute(sql_query,
+                        {
+                            "start_time": start_time,
+                            "end_time": end_time,
+                            "aggregation": aggregation
+                        })
+        session.commit()
+        logger.info("Aggregated stock data")
+    except Exception as e:
+        logger.error(f"Error aggregating stock data: {e}")
         session.rollback()
         raise(e)
 

@@ -6,14 +6,14 @@ Base = declarative_base()
 
 
 class Stock(Base):
-    __tablename__ = 'stocks'
+    __tablename__ = 'dim_stocks'
     id = Column(Integer, autoincrement=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     symbol = Column(String(10), primary_key=True)
 
 
 class StockBar(Base):
-    __tablename__ = 'stock_bars'
+    __tablename__ = 'fact_stock_bars'
     id = Column(Integer, autoincrement=True, primary_key=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     symbol = Column(String(10))
@@ -27,8 +27,23 @@ class StockBar(Base):
     is_imputed = Boolean()
 
 
+class StockBarAggregate(Base):
+    __tablename__ = 'agg_stock_bars'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    symbol = Column(String(10))
+    open = Column(Float)
+    close = Column(Float)
+    high = Column(Float)
+    low = Column(Float)
+    volume = Column(Float)
+    number_trades = Column(Integer)
+    volume_weighted_average_price = Column(Float)
+    aggregation = Column(String(10))  # e.g., "1D", "1H", "15m"
+
+
 class StockIndicator(Base):
-    __tablename__ = 'bar_indicators'
+    __tablename__ = 'agg_bar_indicators'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
@@ -69,27 +84,27 @@ class StockIndicator(Base):
 
     # On-Balance Volume
     obv = Column(Float)
-
-
-class StockOrder(Base):
-    __tablename__ = 'stock_orders'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    symbol = Column(String(10))
-    order_id = Column(String(50))
-    order_type = Column(String(20))  # e.g., "buy", "sell"
-    quantity = Column(Integer)
-    price = Column(Float)
-    status = Column(String(20))  # e.g., "completed", "pending", "canceled"
-
-
-class StockTrade(Base):
-    __tablename__ = 'stock_trades'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    symbol = Column(String(10))
-    trade_id = Column(String(50))
-    order_id = Column(String(50))
-    quantity = Column(Integer)
-    price = Column(Float)
-    profit_loss = Column(Float)  # Profit or loss from the trade
+#
+#
+# class StockOrder(Base):
+#     __tablename__ = 'fact_stock_orders'
+#     id = Column(Integer, autoincrement=True, primary_key=True)
+#     created_at = Column(DateTime, default=datetime.now(timezone.utc))
+#     symbol = Column(String(10))
+#     order_id = Column(String(50))
+#     order_type = Column(String(20))  # e.g., "buy", "sell"
+#     quantity = Column(Integer)
+#     price = Column(Float)
+#     status = Column(String(20))  # e.g., "completed", "pending", "canceled"
+#
+#
+# class StockTrade(Base):
+#     __tablename__ = 'fact_stock_trades'
+#     id = Column(Integer, autoincrement=True, primary_key=True)
+#     created_at = Column(DateTime, default=datetime.now(timezone.utc))
+#     symbol = Column(String(10))
+#     trade_id = Column(String(50))
+#     order_id = Column(String(50))
+#     quantity = Column(Integer)
+#     price = Column(Float)
+#     profit_loss = Column(Float)  # Profit or loss from the trade

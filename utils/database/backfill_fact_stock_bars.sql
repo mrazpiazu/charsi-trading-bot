@@ -4,7 +4,7 @@ WITH params AS (
     TIMESTAMP :end_time AS end_time
 ),
 symbols AS (
-  SELECT DISTINCT symbol FROM stock_bars
+  SELECT DISTINCT symbol FROM fact_stock_bars
 ),
 minutes AS (
   SELECT
@@ -24,13 +24,13 @@ historical_data AS (
     number_trades,
     volume_weighted_average_price,
     FALSE AS is_imputed
-  FROM stock_bars
+  FROM fact_stock_bars
   WHERE created_at < (SELECT end_time FROM params)
 ),
 only_missing_minutes AS (
   SELECT m.*
   FROM minutes m
-  LEFT JOIN stock_bars h
+  LEFT JOIN fact_stock_bars h
     ON h.symbol = m.symbol AND h.created_at = m.created_at
   WHERE h.created_at IS NULL
 ),
@@ -75,7 +75,7 @@ final AS (
   WHERE created_at >= (SELECT start_time FROM params)
     AND is_imputed = TRUE
 )
-INSERT INTO stock_bars (
+INSERT INTO fact_stock_bars (
   symbol,
   created_at,
   open,

@@ -37,6 +37,15 @@ def intraday_trading_pipeline_dag():
 
     backfill_task = run_backfill_data_task()
 
+
+    @task(task_id="run_aggregation_symbol_data")
+    def run_aggregation_data_task():
+        context = get_current_context()
+        aggregate_stock_data(context["data_interval_start"], context["data_interval_end"], "15min")
+
+    aggregation_task = run_aggregation_data_task()
+
+
     @task(task_id="run_technical_analysis")
     def run_technical_analysis_task():
         context = get_current_context()
@@ -44,6 +53,6 @@ def intraday_trading_pipeline_dag():
 
     technical_analysis_task = run_technical_analysis_task()
 
-    backfill_task >> technical_analysis_task
+    backfill_task >> aggregation_task >> technical_analysis_task
 
 intraday_trading_pipeline_dag()

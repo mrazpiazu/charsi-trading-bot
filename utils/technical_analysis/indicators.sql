@@ -4,7 +4,7 @@ WITH indicators AS (
     LAG(close) OVER (PARTITION BY symbol ORDER BY created_at) AS prev_close,
     LAG(high) OVER (PARTITION BY symbol ORDER BY created_at) AS prev_high,
     LAG(low) OVER (PARTITION BY symbol ORDER BY created_at) AS prev_low
-  FROM stock_bars
+  FROM agg_stock_bars
   WHERE
     created_at <= :end_date
   ORDER BY created_at desc
