@@ -84,27 +84,55 @@ class StockIndicator(Base):
 
     # On-Balance Volume
     obv = Column(Float)
-#
-#
-# class StockOrder(Base):
-#     __tablename__ = 'fact_stock_orders'
-#     id = Column(Integer, autoincrement=True, primary_key=True)
-#     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-#     symbol = Column(String(10))
-#     order_id = Column(String(50))
-#     order_type = Column(String(20))  # e.g., "buy", "sell"
-#     quantity = Column(Integer)
-#     price = Column(Float)
-#     status = Column(String(20))  # e.g., "completed", "pending", "canceled"
-#
-#
-# class StockTrade(Base):
-#     __tablename__ = 'fact_stock_trades'
-#     id = Column(Integer, autoincrement=True, primary_key=True)
-#     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-#     symbol = Column(String(10))
-#     trade_id = Column(String(50))
-#     order_id = Column(String(50))
-#     quantity = Column(Integer)
-#     price = Column(Float)
-#     profit_loss = Column(Float)  # Profit or loss from the trade
+
+
+class StockOrder(Base):
+    __tablename__ = 'fact_stock_orders'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    submitted_at = Column(DateTime)
+    filled_at = Column(DateTime)
+    canceled_at = Column(DateTime)
+
+    symbol = Column(String(10))
+    order_id = Column(String(50))  # Alpaca order ID
+    client_order_id = Column(String(50), nullable=True)
+
+    side = Column(String(10))  # "buy" or "sell"
+    type = Column(String(20))  # "market", "limit", "stop", "stop_limit", etc.
+    order_type = Column(String(20))  # can drop if redundant with `type`
+    status = Column(String(20))  # "new", "filled", "canceled", etc.
+
+    quantity = Column(Integer)
+    filled_quantity = Column(Integer)
+    price = Column(Float)  # intended price
+    limit_price = Column(Float, nullable=True)
+    stop_price = Column(Float, nullable=True)
+    trail_price = Column(Float, nullable=True)
+    trail_percent = Column(Float, nullable=True)
+
+    time_in_force = Column(String(10))  # "gtc", "day", etc.
+    extended_hours = Column(Boolean, default=False)
+
+    parent_order_id = Column(String(50), nullable=True)
+    take_profit_price = Column(Float, nullable=True)
+    stop_loss_price = Column(Float, nullable=True)
+
+    is_simulated = Column(Boolean, default=False)
+
+
+class StockTrade(Base):
+    __tablename__ = 'fact_stock_trades'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    filled_at = Column(DateTime)
+
+    symbol = Column(String(10))
+    trade_id = Column(String(50), unique=True)
+    order_id = Column(String(50))  # foreign key to StockOrder if needed
+
+    quantity = Column(Integer)
+    price = Column(Float)
+    commission = Column(Float, default=0.0)
+    profit_loss = Column(Float)
+    is_simulated = Column(Boolean, default=False)
