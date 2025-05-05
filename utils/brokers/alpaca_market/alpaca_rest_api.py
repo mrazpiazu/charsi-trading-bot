@@ -49,7 +49,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
         keys_to_delete = session.query(StockBar.symbol, StockBar.created_at).filter(
             StockBar.created_at >= start_time,
             StockBar.created_at < end_time,
-            StockBar.is_imputed == True
+            StockBar.symbol.in_(stock_symbols)
         ).all()
 
         logger.info(f"Deleting {len(keys_to_delete)} bars from DB")
