@@ -122,6 +122,7 @@ def run_backfill_fact_stock_bars(start_time, end_time):
             StockBar.is_imputed == True
         )
         session.execute(delete_stmt)
+        session.commit()
         logger.info("Deleted existing data in StockBar table")
 
         logger.info("Backfilling data in StockBar table...")
@@ -158,6 +159,7 @@ def run_agg_stock_bars(start_time, end_time, aggregation):
             StockBarAggregate.aggregation == aggregation
         )
         session.execute(delete_stmt)
+        session.commit()
         logger.info("Deleted existing data in StockBarAggregate table")
 
         logger.info("Aggregating data in StockBarAggregate table...")

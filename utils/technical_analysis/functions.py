@@ -80,6 +80,7 @@ def run_technical_analysis_sql(data_interval_start, data_interval_end):
             StockIndicator.created_at < data_interval_end
         )
         session.execute(delete_stmt)
+        session.commit()
         logger.info("Deleted existing data in StockIndicator table")
 
         logger.info("Running technical analysis SQL query...")
