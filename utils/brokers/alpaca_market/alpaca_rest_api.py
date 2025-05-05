@@ -67,9 +67,7 @@ def get_stock_data(start_time, end_time, stock_symbols: list):
 
     except Exception as e:
         logger.exception(f"Exception in main loop: {e}")
-
-    logger.info("Waiting 5 seconds before retrying connection...")
-    time.sleep(5)
+        raise
 
 
 if __name__ == "__main__":
