@@ -29,23 +29,23 @@ get_logger_config(logging)
     tags=["analysis", "intraday", "trading", "reload"]
 )
 def intraday_trading_pipeline_dag():
+    #
+    # @task(task_id="run_backfill_fact_stock_bars_api")
+    # def run_backfill_data_task():
+    #     context = get_current_context()
+    #
+    #     start_time = context["data_interval_start"]
+    #     end_time = context["data_interval_end"]
+    #
+    #     if end_time - start_time > datetime.timedelta(minutes=15):
+    #         start_time = end_time - datetime.timedelta(minutes=15)
+    #
+    #     run_backfill_fact_stock_bars_api(start_time, end_time)
+    #
+    # backfill_task_api = run_backfill_data_task()
 
-    @task(task_id="run_backfill_fact_stock_bars_api")
-    def run_backfill_data_task():
-        context = get_current_context()
 
-        start_time = context["data_interval_start"]
-        end_time = context["data_interval_end"]
-
-        if end_time - start_time > datetime.timedelta(minutes=15):
-            start_time = end_time - datetime.timedelta(minutes=15)
-
-        run_backfill_fact_stock_bars_api(start_time, end_time)
-
-    backfill_task_api = run_backfill_data_task()
-
-
-    @task(task_id="run_backfill_fact_stock_bars_api")
+    @task(task_id="run_backfill_fact_stock_bars")
     def run_backfill_data_task():
         context = get_current_context()
 
@@ -89,6 +89,7 @@ def intraday_trading_pipeline_dag():
 
     technical_analysis_task = run_technical_analysis_task()
 
-    backfill_task_api >> backfill_task >> aggregation_task >> technical_analysis_task
+    # backfill_task_api >> backfill_task >> aggregation_task >> technical_analysis_task
+    backfill_task >> aggregation_task >> technical_analysis_task
 
 intraday_trading_pipeline_dag()
