@@ -7,6 +7,7 @@ WITH indicators AS (
   FROM agg_stock_bars
   WHERE
     created_at <= :end_date
+--    created_at <= (:end_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')
   ORDER BY created_at desc
   LIMIT 100
 ),

@@ -2,6 +2,7 @@ with raw_bars as (
     select *
     from fact_stock_bars
     where created_at between :start_time and :end_time
+--    where created_at between (:start_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') and (:end_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')
 )
 insert into agg_stock_bars (
     created_at, symbol, open, close, high, low, volume, number_trades, volume_weighted_average_price, aggregation

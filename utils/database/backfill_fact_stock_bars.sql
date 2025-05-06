@@ -2,6 +2,8 @@ WITH params AS (
   SELECT
     TIMESTAMP :start_time AS start_time,
     TIMESTAMP :end_time AS end_time
+--    (:start_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS start_time,
+--    (:end_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS end_time
 ),
 symbols AS (
   SELECT DISTINCT symbol FROM fact_stock_bars
