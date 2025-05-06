@@ -138,7 +138,7 @@ if __name__ == "__main__":
     symbols = ['AAPL', 'TSLA', 'GOOG']
     rows = []
     for symbol in symbols:
-        for _ in range(39):
+        for _ in range(30):
             rows.append({
                 'symbol': symbol,
                 'close': np.random.uniform(100, 110),
