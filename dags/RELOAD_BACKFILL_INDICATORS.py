@@ -14,7 +14,6 @@ get_logger_config(logging)
 @dag(
     dag_id="RELOAD_BACKFILL_INDICATORS",
     start_date=datetime.datetime(2025, 4, 30, 12),
-    end_date=datetime.datetime(2025, 5, 5, 19),
     schedule='*/15 * * * 1-5',
     catchup=True,
     max_active_runs=1,
