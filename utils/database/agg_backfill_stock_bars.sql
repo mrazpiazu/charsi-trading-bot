@@ -75,30 +75,6 @@ final AS (
   WHERE created_at >= (SELECT start_time FROM params)
     AND is_imputed = TRUE
 )
-INSERT INTO fact_stock_bars (
-  symbol,
-  created_at,
-  open,
-  close,
-  high,
-  low,
-  volume,
-  number_trades,
-  volume_weighted_average_price,
-  is_imputed
-)
-SELECT
-  symbol,
-  created_at,
-  open,
-  close,
-  high,
-  low,
-  volume,
-  number_trades,
-  volume_weighted_average_price,
-  is_imputed
-FROM final
 with raw_bars as (
     select *
     from final
