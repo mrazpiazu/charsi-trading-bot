@@ -28,19 +28,19 @@ get_logger_config(logging)
     tags=["analysis", "intraday", "trading", "reload"]
 )
 def intraday_trading_pipeline_dag():
-    #
-    # @task(task_id="run_backfill_fact_stock_bars_api")
-    # def run_backfill_data_task():
-    #     context = get_current_context()
-    #
-    #     start_time = context["data_interval_start"]
-    #     end_time = context["data_interval_end"]
-    #
-    #     if end_time - start_time > datetime.timedelta(minutes=15):
-    #         start_time = end_time - datetime.timedelta(minutes=15)
-    #
-    #     run_backfill_fact_stock_bars_api(start_time, end_time)
-    #
+
+    @task(task_id="run_backfill_fact_stock_bars_api")
+    def run_backfill_data_task():
+        context = get_current_context()
+
+        start_time = context["data_interval_start"]
+        end_time = context["data_interval_end"]
+
+        if end_time - start_time > datetime.timedelta(minutes=15):
+            start_time = end_time - datetime.timedelta(minutes=15)
+
+        run_backfill_fact_stock_bars_api(start_time, end_time)
+
     # backfill_task_api = run_backfill_data_task()
 
 
@@ -56,7 +56,7 @@ def intraday_trading_pipeline_dag():
 
         run_backfill_fact_stock_bars(start_time, end_time)
 
-    backfill_task = run_backfill_data_task()
+    # backfill_task = run_backfill_data_task()
 
 
     @task(task_id="run_agg_stock_bars")
@@ -69,7 +69,8 @@ def intraday_trading_pipeline_dag():
         if end_time - start_time > datetime.timedelta(minutes=15):
             start_time = end_time - datetime.timedelta(minutes=15)
 
-        run_agg_stock_bars(start_time, end_time, "15min")
+        # run_agg_stock_bars(start_time, end_time, "15min")
+        run_agg_backfill_stock_bars(start_time, end_time, "15min")
 
     aggregation_task = run_aggregation_data_task()
 
@@ -89,6 +90,6 @@ def intraday_trading_pipeline_dag():
     technical_analysis_task = run_technical_analysis_task()
 
     # backfill_task_api >> backfill_task >> aggregation_task >> technical_analysis_task
-    backfill_task >> aggregation_task >> technical_analysis_task
+    aggregation_task >> technical_analysis_task
 
 intraday_trading_pipeline_dag()
