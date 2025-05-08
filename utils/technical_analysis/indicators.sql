@@ -90,8 +90,8 @@ stoch_calc AS (
 ),
 stoch_final AS (
   SELECT *,
-    100 * (close - lowest_low_14) / NULLIF((highest_high_14 - lowest_low_14), 0) AS stoch_k,
-    AVG(100 * (close - lowest_low_14) / NULLIF((highest_high_14 - lowest_low_14), 0)) OVER (PARTITION BY symbol ORDER BY created_at ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS stoch_d
+    100 * (close - lowest_low_14) / NULLIF((highest_high_14 - lowest_low_14), 0) AS stochastic_oscillator_k,
+    AVG(100 * (close - lowest_low_14) / NULLIF((highest_high_14 - lowest_low_14), 0)) OVER (PARTITION BY symbol ORDER BY created_at ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS stochastic_oscillator_d
   FROM stoch_calc
 ),
 -- Bollinger Bands
