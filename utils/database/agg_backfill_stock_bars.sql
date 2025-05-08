@@ -74,8 +74,8 @@ final AS (
   FROM filled
   WHERE created_at >= (SELECT start_time FROM params)
     AND is_imputed = TRUE
-)
-with raw_bars as (
+),
+raw_bars as (
     select *
     from final
     where created_at between :start_time and :end_time
