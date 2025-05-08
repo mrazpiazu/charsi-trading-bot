@@ -5,29 +5,38 @@ WITH intervals AS (
     INTERVAL :aggregation
   ) AS bucket_start
 ),
-resampled AS (
+joined AS (
   SELECT
-    i.bucket_start as created_at,
-    f.symbol AS symbol,
-    FIRST_VALUE(f.open) OVER w AS open,
-    LAST_VALUE(f.close) OVER w AS close,
-    MAX(f.high) OVER w AS high,
-    MIN(f.low) OVER w AS low,
-    SUM(f.volume) OVER w AS volume,
-    SUM(f.number_trades) OVER w AS number_trades,
-    SUM(f.volume * f.close) OVER w / NULLIF(SUM(f.volume) OVER w, 0) AS volume_weighted_average_price,
-    :aggregation AS aggregation
+    i.bucket_start,
+    f.symbol,
+    f.created_at,
+    f.open,
+    f.close,
+    f.high,
+    f.low,
+    f.volume,
+    f.number_trades
   FROM intervals i
   JOIN fact_stock_bars f
     ON f.created_at >= i.bucket_start
    AND f.created_at < i.bucket_start + INTERVAL :aggregation
+),
+resampled AS (
+  SELECT
+    bucket_start AS created_at,
+    symbol,
+    FIRST_VALUE(open) OVER w AS open,
+    LAST_VALUE(close) OVER w AS close,
+    MAX(high) AS high,
+    MIN(low) AS low,
+    SUM(volume) AS volume,
+    SUM(number_trades) AS number_trades,
+    SUM(volume * close)::NUMERIC / NULLIF(SUM(volume), 0) AS volume_weighted_average_price,
+    :aggregation AS aggregation
+  FROM joined
   WINDOW w AS (
-    PARTITION BY f.symbol, i.bucket_start
-    ORDER BY f.created_at
-    RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    PARTITION BY symbol, bucket_start ORDER BY created_at
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   )
+  GROUP BY bucket_start, symbol
 )
-INSERT INTO agg_stock_bars (
-  created_at, symbol, open, close, high, low, volume, number_trades, volume_weighted_average_price, aggregation
-)
-SELECT * FROM resampled;
