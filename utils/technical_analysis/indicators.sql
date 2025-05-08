@@ -162,7 +162,6 @@ obv_final AS (
 )
 -- Final insert
 INSERT INTO agg_bar_indicators (
-  id,
   created_at,
   symbol,
   rsi,
@@ -187,7 +186,6 @@ INSERT INTO agg_bar_indicators (
   obv
 )
 SELECT
-  id,
   created_at,
   symbol,
   rsi,
