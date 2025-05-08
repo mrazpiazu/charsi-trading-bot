@@ -60,7 +60,7 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
     df["atr_14"] = tr.rolling(window=14).mean()
 
-    # ADX (14)
+    # ADX (14) # TODO check this, gives nan
     plus_dm = np.where((df["high"] - df["prev_high"]) > (df["prev_low"] - df["low"]),
                        np.maximum(df["high"] - df["prev_high"], 0), 0)
     minus_dm = np.where((df["prev_low"] - df["low"]) > (df["high"] - df["prev_high"]),
@@ -151,11 +151,12 @@ def insert_indicators(session, df):
     df.to_sql(INDICATOR_TABLE, session.bind, if_exists="append", index=False)
 
 
-def get_unique_symbols(session):
+def get_unique_symbols(session, start_date, end_date):
     query = text(f"""
-        SELECT DISTINCT symbol
+        SELECT 
+            DISTINCT symbol
         FROM {AGG_TABLE}
-        WHERE created_at >= :start AND created_at < :end
+        WHERE created_at = :end
     """)
     result = session.execute(query, {"start": start_date, "end": end_date})
     return [row[0] for row in result.fetchall()]
@@ -165,9 +166,11 @@ def get_unique_symbols(session):
 
 def main(start_date: datetime, end_date: datetime, aggregation):
 
+    start_date = start_date - timedelta(days=3)
+
     session = SessionLocal()
 
-    symbols = get_unique_symbols(session)
+    symbols = get_unique_symbols(session, start_date, end_date)
 
     try:
         for symbol in symbols:
@@ -190,8 +193,8 @@ def main(start_date: datetime, end_date: datetime, aggregation):
 if __name__ == "__main__":
     from datetime import timedelta
 
-    start_date = datetime.now() - timedelta(minutes=15)
-    end_date = datetime.now()
+    start_date = datetime(2025, 5, 8, 16, 0, 0)
+    end_date = start_date + timedelta(minutes=15)
     aggregation = "15 minutes"
 
     main(start_date, end_date, aggregation)
