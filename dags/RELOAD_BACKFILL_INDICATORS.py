@@ -70,7 +70,8 @@ def intraday_trading_pipeline_dag():
             start_time = end_time - datetime.timedelta(minutes=15)
 
         # run_agg_stock_bars(start_time, end_time, "15min")
-        run_agg_backfill_stock_bars(start_time, end_time, "15min")
+        # run_agg_backfill_stock_bars(start_time, end_time, "15 minutes")
+        run_agg_stock_bars_candles(start_time, end_time, "15 minutes")
 
     aggregation_task = run_aggregation_data_task()
 

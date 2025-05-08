@@ -176,6 +176,46 @@ def run_backfill_fact_stock_bars_api(start_time, end_time):
     logger.info(f"Reloaded {len(symbols_list)} symbols from Alpaca API")
 
 
+def run_agg_stock_bars_candles(start_time, end_time, aggregation):
+
+    """
+    Aggregate stock data.
+    """
+
+    logger.info("Aggregating stock data...")
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    with open(f"{current_dir}/agg_stock_bars_candles.sql", "r") as file:
+        sql_query = text(file.read())
+
+    try:
+
+        logger.info("Deleting existing aggregated data in StockBarAggregate table...")
+        delete_stmt = StockBarAggregate.__table__.delete().where(
+            StockBarAggregate.created_at >= start_time,
+            StockBarAggregate.created_at < end_time,
+            StockBarAggregate.aggregation == aggregation
+        )
+        session.execute(delete_stmt)
+        session.commit()
+        logger.info("Deleted existing data in StockBarAggregate table")
+
+        logger.info("Aggregating data in StockBarAggregate table...")
+        session.execute(sql_query,
+                        {
+                            "start_time": start_time,
+                            "end_time": end_time,
+                            "aggregation": aggregation
+                        })
+        session.commit()
+        logger.info("Aggregated stock data")
+    except Exception as e:
+        logger.error(f"Error aggregating stock data: {e}")
+        session.rollback()
+        raise
+
+
 def run_agg_backfill_stock_bars(start_time, end_time, aggregation):
 
     """
