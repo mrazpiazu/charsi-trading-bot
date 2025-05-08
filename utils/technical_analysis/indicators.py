@@ -1,162 +1,197 @@
+from datetime import datetime
+import pandas as pd
+from sqlalchemy import text
+from utils.database.db import SessionLocal
+from utils.logger.logger import get_logger_config
+import logging
+
+logger = logging.getLogger("indicators_pandas")
+get_logger_config(logging)
+
+# --- CONFIG ---
+AGG_TABLE = "agg_stock_bars"
+INDICATOR_TABLE = "agg_bar_indicators"
+
+# --- INDICATOR FUNCTIONS ---
+
+def add_previous_columns(df):
+    df["prev_close"] = df["close"].shift(1)
+    df["prev_high"] = df["high"].shift(1)
+    df["prev_low"] = df["low"].shift(1)
+    return df
+
+import numpy as np
 import pandas as pd
 
+def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df.set_index("created_at", inplace=True)
+    df.sort_index(inplace=True)
 
-def calculate_rsi(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """
-    Calculate the Relative Strength Index (RSI) for a given DataFrame.
+    # Previo
+    df["prev_close"] = df["close"].shift(1)
+    df["prev_high"] = df["high"].shift(1)
+    df["prev_low"] = df["low"].shift(1)
 
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'close' prices.
-    period (int): The number of periods to use for RSI calculation.
+    # RSI (14) con EMA (Wilder)
+    delta = df["close"].diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+    avg_gain = gain.ewm(alpha=1/14, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
+    rs = avg_gain / avg_loss
+    df["rsi"] = 100 - (100 / (1 + rs))
 
-    Returns:
-    pd.Series: Series containing the RSI values.
-    """
-    delta = df['close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    # EMA 12 y 26
+    df["ema_12"] = df["close"].ewm(span=12, adjust=False).mean()
+    df["ema_26"] = df["close"].ewm(span=26, adjust=False).mean()
 
-    rs = gain / loss
-    rsi = 100 - (100 / (1 + rs))
+    # MACD
+    df["macd_line"] = df["ema_12"] - df["ema_26"]
+    df["macd_signal"] = df["macd_line"].ewm(span=9, adjust=False).mean()
 
-    return rsi
+    # SMA 20
+    df["sma_20"] = df["close"].rolling(window=20).mean()
 
+    # ATR (14)
+    tr1 = df["high"] - df["low"]
+    tr2 = abs(df["high"] - df["prev_close"])
+    tr3 = abs(df["low"] - df["prev_close"])
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+    df["atr_14"] = tr.rolling(window=14).mean()
 
-def calculate_sma(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """
-    Calculate the Simple Moving Average (SMA) for a given DataFrame.
+    # ADX (14)
+    plus_dm = np.where((df["high"] - df["prev_high"]) > (df["prev_low"] - df["low"]),
+                       np.maximum(df["high"] - df["prev_high"], 0), 0)
+    minus_dm = np.where((df["prev_low"] - df["low"]) > (df["high"] - df["prev_high"]),
+                        np.maximum(df["prev_low"] - df["low"], 0), 0)
+    tr14 = tr.rolling(window=14).sum()
+    plus_di = 100 * pd.Series(plus_dm).rolling(window=14).sum() / tr14
+    minus_di = 100 * pd.Series(minus_dm).rolling(window=14).sum() / tr14
+    dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+    df["adx_14"] = dx.rolling(window=14).mean()
 
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'close' prices.
-    period (int): The number of periods to use for SMA calculation.
+    # Stochastic Oscillator
+    low_14 = df["low"].rolling(window=14).min()
+    high_14 = df["high"].rolling(window=14).max()
+    df["stochastic_oscillator_k"] = 100 * (df["close"] - low_14) / (high_14 - low_14)
+    df["stochastic_oscillator_d"] = df["stochastic_oscillator_k"].rolling(window=3).mean()
 
-    Returns:
-    pd.Series: Series containing the SMA values.
-    """
-    sma = df['close'].rolling(window=period).mean()
-    return sma
+    # Bollinger Bands
+    std_20 = df["close"].rolling(window=20).std()
+    df["bollinger_bands_upper"] = df["sma_20"] + 2 * std_20
+    df["bollinger_bands_lower"] = df["sma_20"] - 2 * std_20
 
+    # Pivot Points (Classic)
+    pivot = (df["prev_high"] + df["prev_low"] + df["prev_close"]) / 3
+    df["pivot"] = pivot
+    df["support_1"] = 2 * pivot - df["prev_high"]
+    df["resistance_1"] = 2 * pivot - df["prev_low"]
 
-def calculate_ema(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """
-    Calculate the Exponential Moving Average (EMA) for a given DataFrame.
+    # Donchian Channels (20)
+    df["donchian_upper"] = df["high"].rolling(window=20).max()
+    df["donchian_lower"] = df["low"].rolling(window=20).min()
 
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'close' prices.
-    period (int): The number of periods to use for EMA calculation.
+    # CCI (20)
+    tp = (df["high"] + df["low"] + df["close"]) / 3
+    cci_sma = tp.rolling(window=20).mean()
+    cci_std = tp.rolling(window=20).std()
+    df["cci_20"] = (tp - cci_sma) / (0.015 * cci_std)
 
-    Returns:
-    pd.Series: Series containing the EMA values.
-    """
-    ema = df['close'].ewm(span=period, adjust=False).mean()
-    return ema
+    # ROC (12)
+    df["roc_12"] = 100 * (df["close"] - df["close"].shift(12)) / df["close"].shift(12)
 
+    # OBV
+    obv = [0]
+    for i in range(1, len(df)):
+        if df["close"].iloc[i] > df["close"].iloc[i-1]:
+            obv.append(obv[-1] + df["volume"].iloc[i])
+        elif df["close"].iloc[i] < df["close"].iloc[i-1]:
+            obv.append(obv[-1] - df["volume"].iloc[i])
+        else:
+            obv.append(obv[-1])
+    df["obv"] = obv
 
-def calculate_macd(df: pd.DataFrame, short_window: int = 12, long_window: int = 26, signal_window: int = 9) -> pd.DataFrame:
-    """
-    Calculate the Moving Average Convergence Divergence (MACD) for a given DataFrame.
-
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'close' prices.
-    short_window (int): The short window for MACD calculation.
-    long_window (int): The long window for MACD calculation.
-    signal_window (int): The signal line window for MACD calculation.
-
-    Returns:
-    pd.DataFrame: DataFrame containing the MACD and Signal values.
-    """
-    ema_short = df['close'].ewm(span=short_window, adjust=False).mean()
-    ema_long = df['close'].ewm(span=long_window, adjust=False).mean()
-    macd = ema_short - ema_long
-    signal = macd.ewm(span=signal_window, adjust=False).mean()
-
-    return pd.DataFrame({'MACD': macd, 'Signal': signal})
-
-
-def calculate_bollinger_bands(df: pd.DataFrame, period: int = 20, num_std_dev: int = 2) -> pd.DataFrame:
-    """
-    Calculate the Bollinger Bands for a given DataFrame.
-
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'close' prices.
-    period (int): The number of periods to use for Bollinger Bands calculation.
-    num_std_dev (int): The number of standard deviations to use for the bands.
-
-    Returns:
-    pd.DataFrame: DataFrame containing the upper and lower Bollinger Bands.
-    """
-    sma = df['close'].rolling(window=period).mean()
-    std_dev = df['close'].rolling(window=period).std()
-
-    upper_band = sma + (std_dev * num_std_dev)
-    lower_band = sma - (std_dev * num_std_dev)
-
-    return pd.DataFrame({'Upper Band': upper_band, 'lower Band': lower_band})
-
-
-def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """
-    Calculate the Average True Range (ATR) for a given DataFrame.
-
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'high', 'low', and 'close' prices.
-    period (int): The number of periods to use for ATR calculation.
-
-    Returns:
-    pd.Series: Series containing the ATR values.
-    """
-    high_low = df['high'] - df['low']
-    high_prev_close = abs(df['high'] - df['close'].shift(1))
-    low_prev_close = abs(df['low'] - df['close'].shift(1))
-
-    tr = pd.concat([high_low, high_prev_close, low_prev_close], axis=1).max(axis=1)
-    atr = tr.rolling(window=period).mean()
-
-    return atr
+    df.reset_index(inplace=True)
+    return df
 
 
-def calculate_stochastic_oscillator(df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
-    """
-    Calculate the Stochastic Oscillator for a given DataFrame.
+# --- DB FUNCTIONS ---
 
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'high', 'low', and 'close' prices.
-    period (int): The number of periods to use for Stochastic Oscillator calculation.
+def fetch_ohlcv(session, symbol, start_date, end_date, aggregation):
+    query = text(f"""
+        SELECT created_at, symbol, open, close, high, low, volume, number_trades, volume_weighted_average_price
+        FROM {AGG_TABLE}
+        WHERE 
+            symbol = :symbol AND 
+            created_at BETWEEN :start AND :end AND
+            aggregation = :aggregation
+        ORDER BY created_at
+    """)
+    result = session.execute(query, {"symbol": symbol, "start": start_date, "end": end_date, "aggregation": aggregation})
+    return pd.DataFrame(result.fetchall(), columns=result.keys())
 
-    Returns:
-    pd.DataFrame: DataFrame containing the %K and %D values.
-    """
-    low_min = df['low'].rolling(window=period).min()
-    high_max = df['high'].rolling(window=period).max()
+def delete_existing_indicators(session, symbol, start_date, end_date):
+    delete_query = text(f"""
+        DELETE FROM {INDICATOR_TABLE}
+        WHERE symbol = :symbol
+        AND created_at BETWEEN :start AND :end
+    """)
+    session.execute(delete_query, {"symbol": symbol, "start": start_date, "end": end_date})
+    session.commit()
 
-    k = 100 * ((df['close'] - low_min) / (high_max - low_min))
-    d = k.rolling(window=3).mean()
+def insert_indicators(session, df):
+    cols = [
+        "created_at", "symbol", "rsi", "ema_12", "ema_26", "macd_line", "macd_signal",
+        "sma_20", "atr_14", "adx_14", "stochastic_oscillator_k", "stochastic_oscillator_d",
+        "bollinger_bands_upper", "bollinger_bands_lower", "pivot", "support_1", "resistance_1",
+        "donchian_upper", "donchian_lower", "cci_20", "roc_12", "obv"
+    ]
+    df = df[cols].dropna(subset=["rsi"])
+    df.to_sql(INDICATOR_TABLE, session.bind, if_exists="append", index=False)
 
-    return pd.DataFrame({'%K': k, '%D': d})
+
+def get_unique_symbols(session):
+    query = text(f"""
+        SELECT DISTINCT symbol
+        FROM {AGG_TABLE}
+        WHERE created_at >= :start AND created_at < :end
+    """)
+    result = session.execute(query, {"start": start_date, "end": end_date})
+    return [row[0] for row in result.fetchall()]
 
 
-def calculate_adx(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """
-    Calculate the Average Directional Index (ADX) for a given DataFrame.
+# --- MAIN EXECUTION ---
 
-    Parameters:
-    df (pd.DataFrame): DataFrame containing 'high', 'low', and 'close' prices.
-    period (int): The number of periods to use for ADX calculation.
+def main(start_date: datetime, end_date: datetime, aggregation):
 
-    Returns:
-    pd.Series: Series containing the ADX values.
-    """
-    high = df['high']
-    low = df['low']
-    close = df['close']
+    session = SessionLocal()
 
-    tr = calculate_atr(df, period)
-    plus_dm = high.diff().where((high.diff() > low.diff()) & (high.diff() > 0), 0)
-    minus_dm = low.diff().where((low.diff() > high.diff()) & (low.diff() > 0), 0)
+    symbols = get_unique_symbols(session)
 
-    plus_di = 100 * (plus_dm.rolling(window=period).mean() / tr)
-    minus_di = 100 * (minus_dm.rolling(window=period).mean() / tr)
+    try:
+        for symbol in symbols:
+            print(f"[INFO] Processing {symbol}")
+            df = fetch_ohlcv(session, symbol, start_date, end_date, aggregation)
+            if df.empty:
+                print(f"[WARN] No data for {symbol}, skipping.")
+                continue
+            enriched = calculate_indicators(df)
+            delete_existing_indicators(session, symbol, start_date, end_date)
+            insert_indicators(session, enriched)
+            print(f"[OK] Inserted indicators for {symbol}")
+    except Exception as e:
+        logger.error(f"Error processing indicators: {e}")
+        session.rollback()
+    finally:
+        session.close()
 
-    adx = 100 * ((plus_di - minus_di).abs() / (plus_di + minus_di)).rolling(window=period).mean()
 
-    return adx
+if __name__ == "__main__":
+    from datetime import timedelta
+
+    start_date = datetime.now() - timedelta(minutes=15)
+    end_date = datetime.now()
+    aggregation = "15 minutes"
+
+    main(start_date, end_date, aggregation)
