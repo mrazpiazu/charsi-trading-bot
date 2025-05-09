@@ -1,10 +1,9 @@
 import datetime
-from datetime import timedelta
 from airflow.decorators import dag, task
 from airflow.operators.python import get_current_context
 import logging
 
-from utils.database.functions import *
+from utils.database.functions import insert_new_stocks
 from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger("stock_update_dag")

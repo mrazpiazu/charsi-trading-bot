@@ -4,8 +4,8 @@ from airflow.decorators import dag, task, task_group
 from airflow.operators.python import get_current_context
 import logging
 
-from utils.database.functions import *
-from utils.technical_analysis.functions import *
+from utils.database.functions import run_backfill_fact_stock_bars_api, run_backfill_fact_stock_bars, run_agg_stock_bars_candles
+from utils.technical_analysis.functions import run_technical_analysis_sql
 from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger("intraday_trading_pipeline_dag")
@@ -14,7 +14,7 @@ get_logger_config(logging)
 
 @dag(
     dag_id="RELOAD_BACKFILL_INDICATORS",
-    start_date=datetime(2025, 4, 30, 12),
+    start_date=datetime.datetime(2025, 4, 30, 12),
     schedule='*/15 12-18 * * 1-5',
     catchup=True,
     max_active_runs=1,
