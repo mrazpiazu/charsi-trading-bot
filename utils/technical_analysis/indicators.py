@@ -23,6 +23,7 @@ def add_previous_columns(df):
 import numpy as np
 import pandas as pd
 
+
 def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.set_index("created_at", inplace=True)
@@ -60,15 +61,20 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
     df["atr_14"] = tr.rolling(window=14).mean()
 
-    # ADX (14) # TODO check this, gives nan
-    plus_dm = np.where((df["high"] - df["prev_high"]) > (df["prev_low"] - df["low"]),
-                       np.maximum(df["high"] - df["prev_high"], 0), 0)
-    minus_dm = np.where((df["prev_low"] - df["low"]) > (df["high"] - df["prev_high"]),
-                        np.maximum(df["prev_low"] - df["low"], 0), 0)
-    tr14 = tr.rolling(window=14).sum()
-    plus_di = 100 * pd.Series(plus_dm).rolling(window=14).sum() / tr14
-    minus_di = 100 * pd.Series(minus_dm).rolling(window=14).sum() / tr14
-    dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+    # ADX (14)
+    df["up_move"] = df["high"] - df["high"].shift(1)
+    df["down_move"] = df["low"].shift(1) - df["low"]
+    df["plus_dm"] = np.where((df["up_move"] > df["down_move"]) & (df["up_move"] > 0), df["up_move"], 0)
+    df["minus_dm"] = np.where((df["down_move"] > df["up_move"]) & (df["down_move"] > 0), df["down_move"], 0)
+    df["tr"] = pd.concat([
+        df["high"] - df["low"],
+        abs(df["high"] - df["close"].shift(1)),
+        abs(df["low"] - df["close"].shift(1))
+    ], axis=1).max(axis=1)
+    atr_14 = df["tr"].rolling(window=14).mean()
+    plus_di_14 = 100 * df["plus_dm"].rolling(window=14).sum() / atr_14
+    minus_di_14 = 100 * df["minus_dm"].rolling(window=14).sum() / atr_14
+    dx = (abs(plus_di_14 - minus_di_14) / (plus_di_14 + minus_di_14)) * 100
     df["adx_14"] = dx.rolling(window=14).mean()
 
     # Stochastic Oscillator
@@ -140,6 +146,7 @@ def delete_existing_indicators(session, symbol, start_date, end_date):
     session.execute(delete_query, {"symbol": symbol, "start": start_date, "end": end_date})
     session.commit()
 
+
 def insert_indicators(session, df):
     cols = [
         "created_at", "symbol", "rsi", "ema_12", "ema_26", "macd_line", "macd_signal",
@@ -153,12 +160,21 @@ def insert_indicators(session, df):
 
 def get_unique_symbols(session, start_date, end_date):
     query = text(f"""
+        WITH counted_bars AS (
+            SELECT
+                symbol,
+                COUNT(*) AS actual_count
+            FROM {AGG_TABLE}
+            WHERE created_at >= :start_date
+                AND created_at < :end_date
+            GROUP BY symbol
+            HAVING COUNT(*) >= 100
+        )
         SELECT 
-            DISTINCT symbol
-        FROM {AGG_TABLE}
-        WHERE created_at = :end
+            cb.symbol
+        FROM counted_bars cb
     """)
-    result = session.execute(query, {"start": start_date, "end": end_date})
+    result = session.execute(query, {"start_date": start_date, "end_date": end_date})
     return [row[0] for row in result.fetchall()]
 
 
@@ -166,7 +182,7 @@ def get_unique_symbols(session, start_date, end_date):
 
 def main(start_date: datetime, end_date: datetime, aggregation):
 
-    start_date = start_date - timedelta(days=3)
+    start_date = start_date - timedelta(days=7)
 
     session = SessionLocal()
 
