@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 from airflow.decorators import dag, task, task_group
 from airflow.operators.python import get_current_context
 import logging
@@ -13,7 +14,7 @@ get_logger_config(logging)
 
 @dag(
     dag_id="RELOAD_BACKFILL_INDICATORS",
-    start_date=datetime.datetime(2025, 4, 30, 12),
+    start_date=datetime(2025, 4, 30, 12),
     schedule='*/15 12-18 * * 1-5',
     catchup=True,
     max_active_runs=1,

@@ -124,17 +124,16 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
 # --- DB FUNCTIONS ---
 
-def fetch_ohlcv(session, symbol, start_date, end_date, aggregation):
+def fetch_ohlcv(session, start_date, end_date, aggregation):
     query = text(f"""
         SELECT created_at, symbol, open, close, high, low, volume, number_trades, volume_weighted_average_price
         FROM {AGG_TABLE}
         WHERE 
-            symbol = :symbol AND 
             created_at BETWEEN :start AND :end AND
             aggregation = :aggregation
-        ORDER BY created_at
+        ORDER BY created_at, symbol
     """)
-    result = session.execute(query, {"symbol": symbol, "start": start_date, "end": end_date, "aggregation": aggregation})
+    result = session.execute(query, {"start": start_date, "end": end_date, "aggregation": aggregation})
     return pd.DataFrame(result.fetchall(), columns=result.keys())
 
 def delete_existing_indicators(session, symbol, start_date, end_date):
@@ -173,6 +172,7 @@ def get_unique_symbols(session, start_date, end_date):
         SELECT 
             cb.symbol
         FROM counted_bars cb
+        ORDER BY cb.symbol
     """)
     result = session.execute(query, {"start_date": start_date, "end_date": end_date})
     return [row[0] for row in result.fetchall()]
@@ -182,23 +182,29 @@ def get_unique_symbols(session, start_date, end_date):
 
 def main(start_date: datetime, end_date: datetime, aggregation):
 
-    start_date = start_date - timedelta(days=7)
+    start_date = start_date - timedelta(days=4)
 
     session = SessionLocal()
 
     symbols = get_unique_symbols(session, start_date, end_date)
 
+    logger.info(f"Found {len(symbols)} symbols to process. Loading OHLCV data...")
+    df_total_ohlcv = fetch_ohlcv(session, start_date, end_date, aggregation)
+
+    list_df = []
+
     try:
         for symbol in symbols:
-            print(f"[INFO] Processing {symbol}")
-            df = fetch_ohlcv(session, symbol, start_date, end_date, aggregation)
+            logger.info(f"Processing {symbol}")
+            df = df_total_ohlcv[df_total_ohlcv["symbol"] == symbol].copy()
             if df.empty:
-                print(f"[WARN] No data for {symbol}, skipping.")
+                logger.info(f"No data for {symbol}, skipping.")
                 continue
-            enriched = calculate_indicators(df)
-            delete_existing_indicators(session, symbol, start_date, end_date)
-            insert_indicators(session, enriched)
-            print(f"[OK] Inserted indicators for {symbol}")
+            df_enriched = calculate_indicators(df)
+            list_df.append(df_enriched)
+            # delete_existing_indicators(session, symbol, start_date, end_date)
+            # insert_indicators(session, df_enriched)
+            # print(f"[OK] Inserted indicators for {symbol}")
     except Exception as e:
         logger.error(f"Error processing indicators: {e}")
         session.rollback()
