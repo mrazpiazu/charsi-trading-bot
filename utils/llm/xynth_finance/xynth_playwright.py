@@ -4,6 +4,7 @@ import logging
 import dotenv
 import os
 import datetime as dt
+import re
 from utils.llm.xynth_finance.xynth_prompts import *
 
 dotenv.load_dotenv()
@@ -70,8 +71,6 @@ async def select_tool(page, tool_name):
 
 async def xynth_conversation_handler(page):
 
-    results_json = []
-
     INITIAL_PROMPT = SYSTEM_PROMPT.format(initial_balance=1000, current_date=dt.datetime.today().strftime("%A, %d of %B of %Y")) + "\n\n" + STOCK_SCREENING_PROMPT["prompt"].format(min_atr=4, max_atr=5)
 
     await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
@@ -81,8 +80,6 @@ async def xynth_conversation_handler(page):
     await page.keyboard.press("Enter")
 
     await page.wait_for_timeout(30000)  # Wait for the response to be generated
-
-    financial_metrics = await page.locator("pre.codebar_results").inner_text()
 
     await select_model(page, TECHNICAL_ANALYSIS_PROMPT["model_name"])
     await select_tool(page, TECHNICAL_ANALYSIS_PROMPT["tool_name"])
@@ -98,7 +95,16 @@ async def xynth_conversation_handler(page):
     await page.fill("textarea.search-bar-input", DEEP_TECHNICAL_ANALYSIS_PROMPT["prompt"])
     await page.keyboard.press("Enter")
 
+    await page.wait_for_selector(30000) # Wait for the response to be generated
 
+    xynth_responses = await page.locator("pre.codebar_results").all()
+
+    responses_texts = [await response.inner_text() for response in xynth_responses]
+
+    logging.info("Responses received from Xynth Finance")
+    trading_actions = re.search(r'\[.*?\]', responses_texts[-1], re.DOTALL)
+
+    return trading_actions
 
 
 # Main function to run the Playwright script
@@ -117,10 +123,10 @@ async def run():
 
         logging.info("Initiating conversation with Xynth Finance")
         # Starts the conversation handler
-        results = await xynth_conversation_handler(page)
+        trading_actions = await xynth_conversation_handler(page)
 
-        # Sends the prompt
-        logging.info(f"Prompt sent")
+        logging.info("Trading actions received from Xynth Finance")
+        logging.info(trading_actions)
 
         await browser.close()
 
