@@ -3,6 +3,7 @@ from playwright.async_api import async_playwright
 import logging
 import dotenv
 import os
+import datetime as dt
 from utils.llm.xynth_finance.xynth_prompts import *
 
 dotenv.load_dotenv()
@@ -71,7 +72,7 @@ async def xynth_conversation_handler(page):
 
     results_json = []
 
-    INITIAL_PROMPT = SYSTEM_PROMPT + "\n\n" + STOCK_SCREENING_PROMPT["prompt"].format(min_atr=4, max_atr=5)
+    INITIAL_PROMPT = SYSTEM_PROMPT.format(initial_balance=1000, current_date=dt.datetime.today().strftime("%A, %d of %B of %Y")) + "\n\n" + STOCK_SCREENING_PROMPT["prompt"].format(min_atr=4, max_atr=5)
 
     await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
     await select_tool(page, STOCK_SCREENING_PROMPT["tool_name"])
