@@ -86,7 +86,7 @@ async def xynth_conversation_handler(page):
 
 
 # Main function to run the Playwright script
-async def run(model_name, tool_name, prompt):
+async def run():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False, slow_mo=100)
         context = await browser.new_context()
@@ -108,8 +108,4 @@ async def run(model_name, tool_name, prompt):
 
 if __name__ == "__main__":
 
-    model_name = "GPT-4o"
-    tool_name = "Code: Stock Financials"
-    prompt = "What is the current price of AMZN and its 50-day moving average?"
-
-    asyncio.run(run(model_name, tool_name, prompt))
+    asyncio.run(run())
