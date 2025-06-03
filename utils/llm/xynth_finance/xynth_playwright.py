@@ -84,6 +84,20 @@ async def xynth_conversation_handler(page):
 
     financial_metrics = await page.locator("pre.codebar_results").inner_text()
 
+    await select_model(page, TECHNICAL_ANALYSIS_PROMPT["model_name"])
+    await select_tool(page, TECHNICAL_ANALYSIS_PROMPT["tool_name"])
+    await page.locator("textarea.search-bar-input").click()
+    await page.fill("textarea.search-bar-input", TECHNICAL_ANALYSIS_PROMPT["prompt"])
+    await page.keyboard.press("Enter")
+
+    await page.wait_for_selector(30000) # Wait for the response to be generated
+
+    await select_model(page, DEEP_TECHNICAL_ANALYSIS_PROMPT["model_name"])
+    await select_tool(page, DEEP_TECHNICAL_ANALYSIS_PROMPT["tool_name"])
+    await page.locator("textarea.search-bar-input").click()
+    await page.fill("textarea.search-bar-input", DEEP_TECHNICAL_ANALYSIS_PROMPT["prompt"])
+    await page.keyboard.press("Enter")
+
 
 
 

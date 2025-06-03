@@ -41,7 +41,21 @@ DEEP_TECHNICAL_ANALYSIS_PROMPT = {
     "prompt": """Please conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least three distinct swing trade setups (each one of a particular stock). 
 Have in mind the total budget mentioned at the beginning of this conversation, and ensure that the total position size across all trades does not exceed this amount, while also considering that we do not need to spend the entire budget, so be flexible with the position sizes.
 For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
-Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.""",
+Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.
+Respond with a single list of JSONs with the following structure:
+[
+    {
+        "stock": "AAPL",
+        "entry_point": 150.00,
+        "stop_loss": 145.00,
+        "target_price": 160.00,
+        "expected_duration": "1-2 weeks",
+        "position_size": 100,
+        "potential_profit_loss": 1000,
+        "risk_reward_ratio": 2.0
+    }
+]
+""",
     "model_name": "GPT-4o",
     "tool_name": "Code: Stock Technical Analysis"
 }
