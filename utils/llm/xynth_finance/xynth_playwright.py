@@ -74,17 +74,20 @@ async def run(model_name, tool_name, prompt):
         context = await browser.new_context()
         page = await context.new_page()
 
-        logging.info("Accediendo a Xynth Finance")
+        logging.info("Loading Xynth Finance")
         await page.goto("https://xynth.finance", timeout=60000)
 
         # Logs in
         await login_to_xynth(page)
+        logging.info("Logged in")
 
         # Selects the model
         await select_model(page, model_name)
+        logging.info(f"Model selected: {model_name}")
 
         # Selects the tool
         await select_tool(page, tool_name)
+        logging.info(f"Tool selected: {tool_name}")
 
         # Clicks on the prompt input area
         await page.locator("textarea.search-bar-input").click()
@@ -94,6 +97,7 @@ async def run(model_name, tool_name, prompt):
 
         # Sends the prompt
         await page.keyboard.press("Enter")
+        logging.info(f"Prompt sent")
 
         await browser.close()
 
