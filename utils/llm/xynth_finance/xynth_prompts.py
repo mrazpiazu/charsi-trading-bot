@@ -49,7 +49,7 @@ Respond with a single list of JSONs with the following structure:
         "entry_point": 150.00,
         "stop_loss": 145.00,
         "target_price": 160.00,
-        "expected_duration": "1-2 weeks",
+        "expected_duration": "5 days",
         "position_size": 100,
         "potential_profit_loss": 1000,
         "risk_reward_ratio": 2.0
