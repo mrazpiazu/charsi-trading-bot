@@ -68,7 +68,7 @@ async def select_tool(page, tool_name):
 
 
 # Main function to run the Playwright script
-async def run(prompt):
+async def run(model_name, tool_name, prompt):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False, slow_mo=100)
         context = await browser.new_context()
@@ -81,11 +81,9 @@ async def run(prompt):
         await login_to_xynth(page)
 
         # Selects the model
-        model_name = "GPT-4o"
         await select_model(page, model_name)
 
         # Selects the tool
-        tool_name = "Code: Technical Indicators"
         await select_tool(page, tool_name)
 
         # Clicks on the prompt input area
@@ -101,6 +99,8 @@ async def run(prompt):
 
 if __name__ == "__main__":
 
+    model_name = "GPT-4o-mini"
+    tool_name = "Code: Stock Financials"
     prompt = "What is the current price of AMZN and its 50-day moving average?"
 
-    asyncio.run(run(prompt))
+    asyncio.run(run(model_name, tool_name, prompt))
