@@ -99,7 +99,7 @@ async def run(model_name, tool_name, prompt):
 
 if __name__ == "__main__":
 
-    model_name = "GPT-4o-mini"
+    model_name = "GPT-4o"
     tool_name = "Code: Stock Financials"
     prompt = "What is the current price of AMZN and its 50-day moving average?"
 
