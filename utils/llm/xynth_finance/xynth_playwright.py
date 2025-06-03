@@ -3,7 +3,7 @@ from playwright.async_api import async_playwright
 import logging
 import dotenv
 import os
-import re
+from utils.llm.xynth_finance.xynth_prompts import *
 
 dotenv.load_dotenv()
 
@@ -67,6 +67,23 @@ async def select_tool(page, tool_name):
     return
 
 
+async def xynth_conversation_handler(page):
+
+    results_json = []
+
+    INITIAL_PROMPT = SYSTEM_PROMPT + "\n\n" + STOCK_SCREENING_PROMPT["prompt"].format(min_atr=4, max_atr=5)
+
+    await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
+    await select_tool(page, STOCK_SCREENING_PROMPT["tool_name"])
+    await page.locator("textarea.search-bar-input").click()
+    await page.fill("textarea.search-bar-input", INITIAL_PROMPT)
+    await page.keyboard.press("Enter")
+
+    await page.wait_for_timeout(30000)  # Wait for the response to be generated
+
+    financial_metrics = await page.locator("pre.codebar_results").inner_text()
+
+
 # Main function to run the Playwright script
 async def run(model_name, tool_name, prompt):
     async with async_playwright() as p:
@@ -81,22 +98,9 @@ async def run(model_name, tool_name, prompt):
         await login_to_xynth(page)
         logging.info("Logged in")
 
-        # Selects the model
-        await select_model(page, model_name)
-        logging.info(f"Model selected: {model_name}")
-
-        # Selects the tool
-        await select_tool(page, tool_name)
-        logging.info(f"Tool selected: {tool_name}")
-
-        # Clicks on the prompt input area
-        await page.locator("textarea.search-bar-input").click()
-
-        # Fill the prompt with a sample query
-        await page.fill("textarea.search-bar-input", prompt)
+        results = await xynth_conversation_handler(page)
 
         # Sends the prompt
-        await page.keyboard.press("Enter")
         logging.info(f"Prompt sent")
 
         await browser.close()
