@@ -101,7 +101,6 @@ async def xynth_conversation_handler(page):
 
     responses_texts = [await response.inner_text() for response in xynth_responses]
 
-    logging.info("Responses received from Xynth Finance")
     trading_actions = re.search(r'\[.*?\]', responses_texts[-1], re.DOTALL)
 
     return trading_actions
