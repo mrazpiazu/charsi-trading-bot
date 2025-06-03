@@ -85,6 +85,8 @@ async def xynth_conversation_handler(page):
     financial_metrics = await page.locator("pre.codebar_results").inner_text()
 
 
+
+
 # Main function to run the Playwright script
 async def run():
     async with async_playwright() as p:
@@ -99,6 +101,8 @@ async def run():
         await login_to_xynth(page)
         logging.info("Logged in")
 
+        logging.info("Initiating conversation with Xynth Finance")
+        # Starts the conversation handler
         results = await xynth_conversation_handler(page)
 
         # Sends the prompt

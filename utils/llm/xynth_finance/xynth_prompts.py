@@ -38,7 +38,8 @@ TECHNICAL_ANALYSIS_PROMPT = {
 }
 
 DEEP_TECHNICAL_ANALYSIS_PROMPT = {
-    "prompt": """Please conduct a deep technical analysis with as many indicators as you see fit for the stock {stock_symbol}. Then, identify at least three distinct swing trade setups. 
+    "prompt": """Please conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least three distinct swing trade setups (each one of a particular stock). 
+Have in mind the total budget mentioned at the beginning of this conversation, and ensure that the total position size across all trades does not exceed this amount, while also considering that we do not need to spend the entire budget, so be flexible with the position sizes.
 For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
 Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.""",
     "model_name": "GPT-4o",
