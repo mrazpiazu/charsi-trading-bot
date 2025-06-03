@@ -68,7 +68,7 @@ async def select_tool(page, tool_name):
 
 
 # Main function to run the Playwright script
-async def run():
+async def run(prompt):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False, slow_mo=100)
         context = await browser.new_context()
@@ -92,7 +92,6 @@ async def run():
         await page.locator("textarea.search-bar-input").click()
 
         # Fill the prompt with a sample query
-        prompt = "What is the current price of Bitcoin?"
         await page.fill("textarea.search-bar-input", prompt)
 
         # Sends the prompt
@@ -101,4 +100,7 @@ async def run():
         await browser.close()
 
 if __name__ == "__main__":
-    asyncio.run(run())
+
+    prompt = "What is the current price of AMZN and its 50-day moving average?"
+
+    asyncio.run(run(prompt))
