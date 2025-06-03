@@ -15,7 +15,7 @@ SYSTEM_PROMPT = """
         
         Potential catalysts for price movement
         
-        Current account balance: {init_balance} USD Current date: Monday, April 21st Market status: Open
+        Current account balance: {init_balance} USD Current date: {current_date} Market status: Open
         
         BE CONCISE AND DIRECT WITH YOUR RESPONSES
         
