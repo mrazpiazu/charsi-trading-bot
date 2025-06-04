@@ -1,4 +1,5 @@
-SYSTEM_PROMPT = """You are an expert swing trader and financial analyst. Your role is to analyze stock price data, charts and technical indicators that I provide to help me identify promising swing trading opportunities.
+STOCK_SCREENING_PROMPT = {
+    "prompt": """"You are an expert swing trader and financial analyst. Your role is to analyze stock price data, charts and technical indicators that I provide to help me identify promising swing trading opportunities.
 Focus on finding trades with a favorable risk-to-reward ratio that can be held for several days to weeks. Provide analysis of key support/resistance levels, momentum indicators, and chart patterns that signal potential swing trade setups. Prefer simple, directional trades rather than complex options strategies.
         
 Pay special attention to:
@@ -30,10 +31,8 @@ IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT 
 IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
 IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
 IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
-"""
 
-STOCK_SCREENING_PROMPT = {
-    "prompt": """Find me stocks 5 that are good for day trading. I am looking for the top 5 stocks that are medium volatility ({min_atr}% < ATR <{max_atr}%), have good trading volume and are showing early signs of trend strength. """,
+Find me stocks 5 that are good for day trading. I am looking for the top 5 stocks that are medium volatility ({min_atr}% < ATR <{max_atr}%), have good trading volume and are showing early signs of trend strength. """,
     "response_format": """ Response format: You MUST ALWAYS ALWAYS ALWAYS ALWAYS ALWAYS include a list of JSONs with the following structure at the end of your response: 
 [
     {
@@ -42,12 +41,14 @@ STOCK_SCREENING_PROMPT = {
     }
 ]
     """,
+    "prompt_name": "Stock Screening",
     "model_name": "Claude 3.7 Sonnet",
     "tool_name": "Code: Stock Screener"
 }
 
 TECHNICAL_ANALYSIS_PROMPT = {
-    "prompt": """Retrieve the 1-month price charts for the 5 stocks we identified earlier. Then conduct technical analysis on each chart to determine which shows the strongest potential for a swing trade.""",
+    "prompt": """Retrieve the 1-month price charts for the stocks we identified earlier. Then conduct technical analysis on each chart to determine which shows the strongest potential for a swing trade.""",
+    "prompt_name": "Technical Analysis",
     "model_name": "Claude 3.7 Sonnet",
     "tool_name": "Code: Technical Indicators"
 }
@@ -56,7 +57,12 @@ DEEP_TECHNICAL_ANALYSIS_PROMPT = {
     "prompt": """Please conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least three distinct swing trade setups (each one of a particular stock). 
 Have in mind the total budget mentioned at the beginning of this conversation, and ensure that the total position size across all trades does not exceed this amount, while also considering that we do not need to spend the entire budget, so be flexible with the position sizes.
 For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
-Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.""",
+Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.
+
+DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO PROVIDE ME WITH THE TRADE SETUPS.
+DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO PROVIDE ME WITH THE TRADE SETUPS.
+DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO PROVIDE ME WITH THE TRADE SETUPS.
+""",
     "response_format": """Response format: You MUST ALWAYS ALWAYS ALWAYS ALWAYS ALWAYS respond with a single list of JSONs with the following structure (one JSON for each trade setup) at the end of your response:
 [
     {
@@ -71,6 +77,7 @@ Base each setup on clear technical signals such as patterns, indicators, or pric
     }
 ]
 """,
+    "prompt_name": "Deep Technical Analysis",
     "model_name": "Claude 3.7 Sonnet",
     "tool_name": "Code: Technical Indicators"
 }
