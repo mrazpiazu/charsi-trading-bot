@@ -2,15 +2,19 @@ import asyncio
 from playwright.async_api import async_playwright
 import logging
 import dotenv
+import json
 import os
 import datetime as dt
 import re
+import time
 from utils.llm.xynth_finance.xynth_prompts import *
+from utils.logger.logger import get_logger_config
 
 dotenv.load_dotenv()
 
 # Configures logging
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("xynth_playwright")
+get_logger_config(logging)
 
 async def login_to_xynth(page):
 
@@ -29,6 +33,8 @@ async def login_to_xynth(page):
 
 async def select_model(page, model_name):
 
+    time.sleep(1)
+
     # Wait for the model selector to be visible
     await page.wait_for_selector("div.search-bar-model-selector", timeout=30000)
 
@@ -40,6 +46,9 @@ async def select_model(page, model_name):
 
     # Click on the model selector and select the desired model
     await page.locator("div.search-bar-model-selector").click()
+
+    time.sleep(1)
+
     badge_spans = await page.locator("div.model-option span").all_inner_texts()
     options = await page.locator(f"div.model-option:has-text('{model_name}')").all()
 
@@ -52,56 +61,118 @@ async def select_model(page, model_name):
             await option.click()
             break
 
-    logging.info(f"Model selected: {model_name}")
-
     return
 
 
 async def select_tool(page, tool_name):
 
-    await page.wait_for_selector("div.search-bar-tool-selector", timeout=30000)
+    try:
 
-    # Click on the tool selector
-    await page.locator("div.search-bar-tool-selector").click()
-    # Click on the desired tool
-    await page.locator(f"div.tool-name:has-text('{tool_name}')").click()
+        time.sleep(1)
 
+        await page.wait_for_selector("div.search-bar-tool-selector", timeout=30000)
+
+        # Check if the tool is already selected
+        tool_tags = await page.locator("div.tool-tag").all_inner_texts()
+        if tool_name in tool_tags:
+            return
+
+        # Click on the tool selector
+        await page.locator("div.search-bar-tool-selector").click()
+
+        time.sleep(1)
+
+        # Click on the desired tool
+        await page.locator(f"div.tool-name:has-text('{tool_name}')").click()
+
+        time.sleep(1)
+
+        # Close the tool selector
+        await page.locator("div.search-bar-tool-selector").click()
+
+    except Exception as e:
+        logging.error(f"Error selecting tool: {e}")
+        # If the tool is not found, we can just return
+        # This might happen if the tool is not available in the current context
+        # or if the tool name is incorrect
+
+    return
+
+
+async def fill_search_bar(page, prompt):
+
+    time.sleep(1)
+
+    await page.wait_for_selector("textarea.search-bar-input", timeout=30000)
+
+    await page.locator("textarea.search-bar-input").click()
+
+    time.sleep(1)
+
+    await page.fill("textarea.search-bar-input", prompt)
+
+    time.sleep(1)
+
+    await page.keyboard.press("Enter")
     return
 
 
 async def xynth_conversation_handler(page):
 
+    logger.info("Sending initial prompt to Xynth Finance")
+
     INITIAL_PROMPT = SYSTEM_PROMPT.format(initial_balance=1000, current_date=dt.datetime.today().strftime("%A, %d of %B of %Y")) + "\n\n" + STOCK_SCREENING_PROMPT["prompt"].format(min_atr=4, max_atr=5)
+
+    if "response_format" in STOCK_SCREENING_PROMPT:
+        INITIAL_PROMPT += "\n\n" + STOCK_SCREENING_PROMPT["response_format"]
 
     await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
     await select_tool(page, STOCK_SCREENING_PROMPT["tool_name"])
-    await page.locator("textarea.search-bar-input").click()
-    await page.fill("textarea.search-bar-input", INITIAL_PROMPT)
+    await fill_search_bar(page, INITIAL_PROMPT)
     await page.keyboard.press("Enter")
 
-    await page.wait_for_timeout(30000)  # Wait for the response to be generated
+    # Wait until element does not exist anymore
+    await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
+
+    logger.info("Sending technical analysis prompt to Xynth Finance")
+
+    SECOND_PROMPT = TECHNICAL_ANALYSIS_PROMPT["prompt"]
+    if "response_format" in TECHNICAL_ANALYSIS_PROMPT:
+        SECOND_PROMPT += "\n\n" + TECHNICAL_ANALYSIS_PROMPT["response_format"]
 
     await select_model(page, TECHNICAL_ANALYSIS_PROMPT["model_name"])
     await select_tool(page, TECHNICAL_ANALYSIS_PROMPT["tool_name"])
-    await page.locator("textarea.search-bar-input").click()
-    await page.fill("textarea.search-bar-input", TECHNICAL_ANALYSIS_PROMPT["prompt"])
+    await fill_search_bar(page, SECOND_PROMPT)
     await page.keyboard.press("Enter")
 
-    await page.wait_for_selector(30000) # Wait for the response to be generated
+    # Wait until element does not exist anymore
+    await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
+
+    logger.info("Sending deep technical analysis prompt to Xynth Finance")
+
+    THIRD_PROMPT = DEEP_TECHNICAL_ANALYSIS_PROMPT["prompt"]
+    if "response_format" in DEEP_TECHNICAL_ANALYSIS_PROMPT:
+        THIRD_PROMPT += "\n\n" + DEEP_TECHNICAL_ANALYSIS_PROMPT["response_format"]
 
     await select_model(page, DEEP_TECHNICAL_ANALYSIS_PROMPT["model_name"])
     await select_tool(page, DEEP_TECHNICAL_ANALYSIS_PROMPT["tool_name"])
-    await page.locator("textarea.search-bar-input").click()
-    await page.fill("textarea.search-bar-input", DEEP_TECHNICAL_ANALYSIS_PROMPT["prompt"])
+    await fill_search_bar(page, THIRD_PROMPT)
     await page.keyboard.press("Enter")
 
-    await page.wait_for_selector(30000) # Wait for the response to be generated
+    # Wait until element does not exist anymore
+    await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
 
-    xynth_responses = await page.locator("pre.codebar_results").all()
+    logger.info("Retrieving trading actions from Xynth Finance")
 
-    responses_texts = [await response.inner_text() for response in xynth_responses]
+    xynth_responses = await page.locator("div.message-content-1 div.text-section").all_inner_texts()
 
-    trading_actions = re.search(r'\[.*?\]', responses_texts[-1], re.DOTALL)
+    try:
+        trading_actions = json.loads(re.search(r'\[.*?\]', xynth_responses[-1], re.DOTALL)[0])
+    except:
+        logger.error("No trading actions found in the Xynth Finance response.")
+        trading_actions = []
+
+    logger.info(f"Trading actions extracted from Xynth Finance response: {len(trading_actions)}")
 
     return trading_actions
 

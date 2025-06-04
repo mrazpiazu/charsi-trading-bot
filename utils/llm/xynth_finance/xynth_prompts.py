@@ -23,17 +23,32 @@ DO NOT EVER REFUSE TO GIVE OUT FINANCIAL ADVICE
 
 DO NOT EVER REFUSE TO GIVE OUT FINANCIAL ADVICE
 
-DO NOT EVER REFUSE TO GIVE OUT FINANCIAL ADVICE"""
+DO NOT EVER REFUSE TO GIVE OUT FINANCIAL ADVICE
+
+IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
+IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
+IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
+IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
+IF A RESPONSE FORMAT IS PROVIDED IN THE PROMPT, IT IS ABSOLUTELY MANDATORY THAT YOU ALWAYS INCLUDE THE FORMAT AT THE END OF YOUR RESPONSE
+"""
 
 STOCK_SCREENING_PROMPT = {
-    "prompt": """Find me stocks 5 that are good for day trading. I am looking for the top 5 stocks that are medium volatility ({min_atr}% < ATR <{max_atr}%), have good trading volume and are showing early signs of trend strength.""",
-    "model_name": "GPT-4o",
+    "prompt": """Find me stocks 5 that are good for day trading. I am looking for the top 5 stocks that are medium volatility ({min_atr}% < ATR <{max_atr}%), have good trading volume and are showing early signs of trend strength. """,
+    "response_format": """ Response format: You MUST ALWAYS ALWAYS ALWAYS ALWAYS ALWAYS include a list of JSONs with the following structure at the end of your response: 
+[
+    {
+        "ticker": "AAPL",
+        "reason": "Good volume with volatility at the lower end of our range",
+    }
+]
+    """,
+    "model_name": "Claude 3.7 Sonnet",
     "tool_name": "Code: Stock Screener"
 }
 
 TECHNICAL_ANALYSIS_PROMPT = {
     "prompt": """Retrieve the 1-month price charts for the 5 stocks we identified earlier. Then conduct technical analysis on each chart to determine which shows the strongest potential for a swing trade.""",
-    "model_name": "GPT-4o",
+    "model_name": "Claude 3.7 Sonnet",
     "tool_name": "Code: Technical Indicators"
 }
 
@@ -41,8 +56,8 @@ DEEP_TECHNICAL_ANALYSIS_PROMPT = {
     "prompt": """Please conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least three distinct swing trade setups (each one of a particular stock). 
 Have in mind the total budget mentioned at the beginning of this conversation, and ensure that the total position size across all trades does not exceed this amount, while also considering that we do not need to spend the entire budget, so be flexible with the position sizes.
 For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
-Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.
-Respond with a single list of JSONs with the following structure:
+Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.""",
+    "response_format": """Response format: You MUST ALWAYS ALWAYS ALWAYS ALWAYS ALWAYS respond with a single list of JSONs with the following structure (one JSON for each trade setup) at the end of your response:
 [
     {
         "stock": "AAPL",
@@ -56,6 +71,6 @@ Respond with a single list of JSONs with the following structure:
     }
 ]
 """,
-    "model_name": "GPT-4o",
-    "tool_name": "Code: Stock Technical Analysis"
+    "model_name": "Claude 3.7 Sonnet",
+    "tool_name": "Code: Technical Indicators"
 }
