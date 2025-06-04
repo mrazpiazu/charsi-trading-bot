@@ -3,7 +3,7 @@ from airflow.decorators import dag, task
 import logging
 
 from utils.logger.logger import get_logger_config
-from utils.llm.xynth_finance.xynth_playwright import run as run_xynth_consultation_pipeline
+from utils.llm.xynth_finance.xynth_playwright import run_xynth_consultation_pipeline
 from utils.brokers.alpaca_market.alpaca_transactions import run_place_order_pipeline
 
 logger = logging.getLogger("run_xynth_full_pipeline_dag")
