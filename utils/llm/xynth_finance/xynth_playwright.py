@@ -159,7 +159,7 @@ async def xynth_conversation_handler(page):
 # Main function to run the Playwright script
 async def run():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=100)
+        browser = await p.chromium.launch(headless=True, slow_mo=100)
         context = await browser.new_context()
         page = await context.new_page()
 
@@ -175,9 +175,10 @@ async def run():
         trading_actions = await xynth_conversation_handler(page)
 
         logging.info("Trading actions received from Xynth Finance")
-        logging.info(trading_actions)
 
         await browser.close()
+
+        return trading_actions
 
 if __name__ == "__main__":
 
