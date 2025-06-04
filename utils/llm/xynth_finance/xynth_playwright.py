@@ -143,36 +143,6 @@ async def xynth_conversation_handler(page):
         # Wait until element does not exist anymore
         await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
 
-    # logger.info("Sending technical analysis prompt to Xynth Finance")
-    #
-    # SECOND_PROMPT = TECHNICAL_ANALYSIS_PROMPT["prompt"]
-    # if "response_format" in TECHNICAL_ANALYSIS_PROMPT:
-    #     SECOND_PROMPT += "\n\n" + TECHNICAL_ANALYSIS_PROMPT["response_format"]
-    #
-    # await select_model(page, TECHNICAL_ANALYSIS_PROMPT["model_name"])
-    # await select_tool(page, TECHNICAL_ANALYSIS_PROMPT["tool_name"])
-    # await fill_search_bar(page, SECOND_PROMPT)
-    # await page.keyboard.press("Enter")
-    #
-    # # Wait until element does not exist anymore
-    # await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
-    #
-    # logger.info("Sending deep technical analysis prompt to Xynth Finance")
-    #
-    # THIRD_PROMPT = DEEP_TECHNICAL_ANALYSIS_PROMPT["prompt"]
-    # if "response_format" in DEEP_TECHNICAL_ANALYSIS_PROMPT:
-    #     THIRD_PROMPT += "\n\n" + DEEP_TECHNICAL_ANALYSIS_PROMPT["response_format"]
-    #
-    # await select_model(page, DEEP_TECHNICAL_ANALYSIS_PROMPT["model_name"])
-    # await select_tool(page, DEEP_TECHNICAL_ANALYSIS_PROMPT["tool_name"])
-    # await fill_search_bar(page, THIRD_PROMPT)
-    # await page.keyboard.press("Enter")
-    #
-    # # Wait until element does not exist anymore
-    # await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
-    #
-    # logger.info("Retrieving trading actions from Xynth Finance")
-
     xynth_responses = await page.locator("div.message-content-1 div.text-section").all_inner_texts()
 
     try:
