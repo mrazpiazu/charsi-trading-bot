@@ -6,9 +6,18 @@ ADD requirements.txt .
 ADD .env .
 
 RUN pip install --upgrade pip && pip install apache-airflow==${AIRFLOW_VERSION} -r requirements.txt
-#
-#USER root
-## RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER root
+RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+RUN playwright install --with-deps
+RUN playwright install chromium
+RUN sudo pip install playwright-stealth
+RUN sudo pip install playwright-recaptcha
+RUN sudo apt install ffmpeg -y
+
+USER airflow
+
 #
 #RUN apt update -y && apt install -y patch patchutils
 #
@@ -19,4 +28,3 @@ RUN pip install --upgrade pip && pip install apache-airflow==${AIRFLOW_VERSION} 
 #    curl https://patch-diff.githubusercontent.com/raw/apache/airflow/pull/49581.patch \
 #    | filterdiff -p1 -i 'providers/fab/src/airflow/*' | patch -p5 -u --verbose
 #
-#USER airflow
