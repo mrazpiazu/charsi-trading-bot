@@ -157,7 +157,7 @@ async def xynth_conversation_handler(page):
 
 
 # Main function to run the Playwright script
-async def run():
+async def run_xynth_consultation_pipeline():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, slow_mo=100)
         context = await browser.new_context()
@@ -182,4 +182,4 @@ async def run():
 
 if __name__ == "__main__":
 
-    asyncio.run(run())
+    asyncio.run(run_xynth_consultation_pipeline())

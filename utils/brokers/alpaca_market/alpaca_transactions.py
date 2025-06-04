@@ -74,9 +74,9 @@ def run_place_order_pipeline(trading_actions):
 
 if __name__ == "__main__":
 
-    from utils.llm.xynth_finance.xynth_playwright import run
+    from utils.llm.xynth_finance.xynth_playwright import run_xynth_consultation_pipeline
     import asyncio
 
-    trading_actions = asyncio.run(run())
+    trading_actions = asyncio.run(run_xynth_consultation_pipeline())
 
     run_place_order_pipeline(trading_actions)
