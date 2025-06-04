@@ -1,6 +1,7 @@
 import datetime
 from airflow.decorators import dag, task
 import logging
+import asyncio
 
 from utils.logger.logger import get_logger_config
 from utils.llm.xynth_finance.xynth_playwright import run_xynth_consultation_pipeline
@@ -30,7 +31,7 @@ def xynth_full_pipeline_dag():
 
     @task(task_id="run_xynth_consultation")
     def run_xynth_consultation():
-        trading_actions = run_xynth_consultation_pipeline()
+        trading_actions = asyncio.run(run_xynth_consultation_pipeline())
         return trading_actions
 
     @task(task_id="place_orders")
