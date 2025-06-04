@@ -9,14 +9,13 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 USER root
 RUN echo 'airflow ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER airflow
 
 RUN playwright install --with-deps
 RUN playwright install chromium
 RUN sudo pip install playwright-stealth
 RUN sudo pip install playwright-recaptcha
 RUN sudo apt install ffmpeg -y
-
-USER airflow
 
 #
 #RUN apt update -y && apt install -y patch patchutils
