@@ -31,11 +31,11 @@ def place_order(symbol, qty, take_profit, stop_loss):
     )
 
     take_profit_request = TakeProfitRequest(
-        limit_price=take_profit
+        limit_price=float(take_profit)
     )
 
     stop_loss_request = StopLossRequest(
-        stop_price=stop_loss
+        stop_price=float(stop_loss)
     )
 
     # preparing orders
