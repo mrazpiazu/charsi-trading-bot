@@ -54,8 +54,8 @@ TECHNICAL_ANALYSIS_PROMPT = {
 }
 
 DEEP_TECHNICAL_ANALYSIS_PROMPT = {
-    "prompt": """Retrieve the 1-month price charts for the stocks we identified earlier. Then conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least one (could be more if they are great fits) distinct swing trade setups (each one of a particular stock). 
-Have in mind the total budget mentioned at the beginning of this conversation, and ensure that the total position size across all trades does not exceed this amount, while also considering that we do not need to spend the entire budget, so be flexible with the position sizes.
+    "prompt": """Retrieve the 1-month price charts for the stocks we identified earlier and conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least one (could be more if they are great fits) distinct swing trade setups (each one of a particular stock). 
+Have in mind the total budget: {initial_balance}, and ensure that the total position size across all trades does not exceed this amount. Also consider that we do not necessarily need to spend the entire budget, so be flexible with the position sizes.
 For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
 Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.
 

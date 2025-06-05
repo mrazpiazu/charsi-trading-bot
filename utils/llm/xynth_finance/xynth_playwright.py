@@ -127,6 +127,8 @@ async def xynth_conversation_handler(page):
 
         if prompt["prompt_name"] == "Stock Screening":
             prompt_text = prompt["prompt"].format(initial_balance=1000, current_date=dt.datetime.today().strftime("%A, %d of %B of %Y"), min_atr=4, max_atr=5)
+        elif prompt["prompt_name"] == "Deep Technical Analysis":
+            prompt_text = prompt["prompt"].format(initial_balance=1000)
         else:
             prompt_text = prompt["prompt"]
 
