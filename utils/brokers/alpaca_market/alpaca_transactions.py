@@ -97,8 +97,8 @@ if __name__ == "__main__":
     from utils.llm.xynth_finance.xynth_playwright import run_xynth_consultation_pipeline
     import asyncio
 
-    # trading_actions = asyncio.run(run_xynth_consultation_pipeline())
+    trading_actions = asyncio.run(run_xynth_consultation_pipeline())
 
-    trading_actions = [{'entry_point': 118.96, 'expected_duration': '12 days', 'position_size': 4, 'potential_profit_loss': 88.18, 'risk_reward_ratio': 2.5, 'stock': 'AMD', 'stop_loss': 110.14, 'target_price': 141.01}, {'entry_point': 83.84, 'expected_duration': '6 days', 'position_size': 3, 'potential_profit_loss': 25.1, 'risk_reward_ratio': 1.78, 'stock': 'UBER', 'stop_loss': 79.15, 'target_price': 92.21}, {'entry_point': 137.97, 'expected_duration': '6 days', 'position_size': 1, 'potential_profit_loss': 12.6, 'risk_reward_ratio': 2.0, 'stock': 'NVDA', 'stop_loss': 131.67, 'target_price': 150.58}]
+    # trading_actions = [{'entry_point': 118.96, 'expected_duration': '12 days', 'position_size': 4, 'potential_profit_loss': 88.18, 'risk_reward_ratio': 2.5, 'stock': 'AMD', 'stop_loss': 110.14, 'target_price': 141.01}, {'entry_point': 83.84, 'expected_duration': '6 days', 'position_size': 3, 'potential_profit_loss': 25.1, 'risk_reward_ratio': 1.78, 'stock': 'UBER', 'stop_loss': 79.15, 'target_price': 92.21}, {'entry_point': 137.97, 'expected_duration': '6 days', 'position_size': 1, 'potential_profit_loss': 12.6, 'risk_reward_ratio': 2.0, 'stock': 'NVDA', 'stop_loss': 131.67, 'target_price': 150.58}]
 
     run_place_order_pipeline(trading_actions)
