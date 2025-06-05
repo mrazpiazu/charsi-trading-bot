@@ -117,6 +117,16 @@ async def fill_search_bar(page, prompt):
     return
 
 
+async def send_message(page, total_prompt, model_name, tool_name):
+
+    await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
+    await select_tool(page, STOCK_SCREENING_PROMPT["tool_name"])
+    await fill_search_bar(page, total_prompt)
+    await page.keyboard.press("Enter")
+
+    return
+
+
 async def xynth_conversation_handler(page):
 
 
@@ -137,15 +147,23 @@ async def xynth_conversation_handler(page):
         else:
             total_prompt = prompt_text
 
-        await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
-        await select_tool(page, STOCK_SCREENING_PROMPT["tool_name"])
-        await fill_search_bar(page, total_prompt)
-        await page.keyboard.press("Enter")
+        await send_message(page, total_prompt, prompt["model_name"], prompt["tool_name"])
 
         # Wait until element does not exist anymore
         await page.wait_for_selector("svg.lucide.lucide-square", state="detached", timeout=900 * 1000)
 
     xynth_responses = await page.locator("div.message-content-1 div.text-section").all_inner_texts()
+
+    retries_count = 0
+    while len(json.loads(re.search(r'\[.*?\]', xynth_responses[-1], re.DOTALL)[0])) == 0:
+        retries_count += 1
+        logger.info("No trading actions found in the Xynth Finance response. Retrying...")
+        time.sleep(5)
+        await send_message(page, RETURN_JSON_PROMPT["prompt"], RETURN_JSON_PROMPT["model_name"], RETURN_JSON_PROMPT["tool_name"])
+        xynth_responses = await page.locator("div.message-content-1 div.text-section").all_inner_texts()
+
+        if retries_count == 2:
+            break
 
     try:
         trading_actions = json.loads(re.search(r'\[.*?\]', xynth_responses[-1], re.DOTALL)[0])

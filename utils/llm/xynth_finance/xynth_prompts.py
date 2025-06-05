@@ -81,3 +81,23 @@ DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO
     "model_name": "Claude 3.7 Sonnet",
     "tool_name": "Code: Technical Indicators"
 }
+
+RETURN_JSON_PROMPT = {
+    "prompt": """You have not responded with the required JSON format.
+Please ensure that your response includes a single list of JSONs with the following structure at the end of your response:
+[
+    {
+        "stock": "AAPL",
+        "entry_point": 150.00,
+        "stop_loss": 145.00,
+        "target_price": 160.00,
+        "expected_duration": "5 days",
+        "position_size": 100,
+        "potential_profit_loss": 1000,
+        "risk_reward_ratio": 2.0
+    }
+]""",
+    "prompt_name": "Respond with JSON",
+    "model_name": "Claude 3.7 Sonnet",
+    "tool_name": "Code: Technical Indicators"
+}
