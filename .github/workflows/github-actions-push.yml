@@ -1,0 +1,21 @@
+name: Build and Deploy to Contabo Instance
+on:
+  push:
+    branches:
+      - master
+permissions: write-all
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: fifsky/ssh-action@master
+      with:
+        host: ${{ secrets.IP }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        user: mrazpiazu # Specify your user here
+        command: |
+          cd charsi-trading-bot
+          git pull
