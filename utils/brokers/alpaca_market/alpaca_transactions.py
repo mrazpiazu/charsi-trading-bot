@@ -10,6 +10,7 @@ from alpaca.trading.enums import OrderSide, OrderType, TimeInForce, OrderClass
 
 from utils.technical_analysis.indicators import *
 from utils.database.db import *
+from utils.telegram.telegram import send_telegram_message
 from utils.database.models import *
 from utils.logger.logger import get_logger_config
 
@@ -73,7 +74,22 @@ def run_place_order_pipeline(trading_actions):
 
         logging.info(f"Placing order for {symbol} with qty={qty}, take_profit={take_profit}, stop_loss={stop_loss}")
         market_order = place_order(symbol, qty, take_profit, stop_loss)
-        logging.info(f"Order placed - order_id: {market_order.id}")
+        logging.info(f"Order placed - order_id: {market_order.id.urn}")
+
+        telegram_message = (
+            f"{dt.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            f"Order placed for {symbol}:\n"
+            f"Entry Point: {action['entry_point']}\n"
+            f"Position Size: {qty}\n"
+            f"Take Profit: {take_profit}\n"
+            f"Stop Loss: {stop_loss}\n"
+            f"Expected Duration: {action['expected_duration']}\n"
+            f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
+            f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"
+            f"Order ID: {market_order.id.urn}\n"
+        )
+
+        send_telegram_message(telegram_message)
 
 
 if __name__ == "__main__":
