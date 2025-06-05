@@ -55,13 +55,15 @@ def place_order(symbol, qty, take_profit, stop_loss, paper=True):
         order_data=market_order_data
     )
 
-    return
+    return market_order
 
 
 def run_place_order_pipeline(trading_actions):
     """
     Run the pipeline to place orders based on trading actions.
     """
+
+    market_orders = []
 
     for action in trading_actions:
         symbol = action["stock"]
@@ -70,7 +72,8 @@ def run_place_order_pipeline(trading_actions):
         stop_loss = action["stop_loss"]
 
         logging.info(f"Placing order for {symbol} with qty={qty}, take_profit={take_profit}, stop_loss={stop_loss}")
-        place_order(symbol, qty, take_profit, stop_loss)
+        market_order = place_order(symbol, qty, take_profit, stop_loss)
+        logging.info(f"Order placed - order_id: {market_order.id}")
 
 
 if __name__ == "__main__":

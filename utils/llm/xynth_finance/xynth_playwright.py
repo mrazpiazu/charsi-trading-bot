@@ -120,7 +120,7 @@ async def fill_search_bar(page, prompt):
 async def xynth_conversation_handler(page):
 
 
-    for prompt in [STOCK_SCREENING_PROMPT, TECHNICAL_ANALYSIS_PROMPT, DEEP_TECHNICAL_ANALYSIS_PROMPT]:
+    for prompt in [STOCK_SCREENING_PROMPT, DEEP_TECHNICAL_ANALYSIS_PROMPT]:
 
         logger.info(f"Sending {prompt["prompt_name"]} prompt to Xynth Finance")
 
