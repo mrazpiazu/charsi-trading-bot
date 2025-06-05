@@ -23,7 +23,7 @@ get_logger_config(logging)
         'retry_delay': datetime.timedelta(minutes=5),
         'email_on_failure': False,
         'email_on_retry': False,
-        'depend_on_past': True
+        'depend_on_past': False
     },
     tags=["order", "trading", "xynth"]
 )
