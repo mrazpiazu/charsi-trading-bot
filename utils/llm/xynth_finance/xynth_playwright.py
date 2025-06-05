@@ -150,7 +150,8 @@ async def xynth_conversation_handler(page):
     try:
         trading_actions = json.loads(re.search(r'\[.*?\]', xynth_responses[-1], re.DOTALL)[0])
     except:
-        logger.error("No trading actions found in the Xynth Finance response.")
+        logger.error("No trading actions found in the Xynth Finance response. Xynth response:")
+        logger.error(xynth_responses[-1])
         trading_actions = []
 
     logger.info(f"Trading actions extracted from Xynth Finance response: {len(trading_actions)}")
