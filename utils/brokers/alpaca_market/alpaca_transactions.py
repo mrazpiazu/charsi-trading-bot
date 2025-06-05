@@ -77,7 +77,7 @@ def run_place_order_pipeline(trading_actions):
         logging.info(f"Order placed - order_id: {market_order.id.urn}")
 
         telegram_message = (
-            f"{dt.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            f"{dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"Order placed for {symbol}:\n"
             f"Entry Point: {action['entry_point']}\n"
             f"Position Size: {qty}\n"
