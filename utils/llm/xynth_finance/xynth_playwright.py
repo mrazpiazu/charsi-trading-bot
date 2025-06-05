@@ -177,6 +177,26 @@ async def xynth_conversation_handler(page):
     return trading_actions
 
 
+def clean_trading_actions(trading_actions):
+
+    clean_trading_actions = []
+
+    for action in trading_actions:
+        if not all(key in action for key in ["stock", "entry_point", "stop_loss", "target_price", "expected_duration", "position_size", "potential_profit_loss", "risk_reward_ratio"]):
+            logger.error(f"Invalid trading action structure found: {action}")
+            continue
+        if float(action["stop_loss"]) >= float(action["entry_point"]):
+            logger.error(f"Removing action for stock {action["stock"]} - Reason: Stop loss is greater than or equal to entry point")
+            continue
+        if float(action["stop_loss"]) >= float(action['target_price']):
+            logger.error(f"Removing action for stock {action["stock"]} - Reason: Stop loss is greater than or equal to target price")
+            continue
+        if float(action["potential_profit_loss"]) <= 0:
+            logger.error(f"Removing action for stock {action["stock"]} - Reason: Potential profit/loss is less than or equal to zero")
+            continue
+
+    return clean_trading_actions
+
 # Main function to run the Playwright script
 async def run_xynth_consultation_pipeline():
     async with async_playwright() as p:
@@ -198,6 +218,8 @@ async def run_xynth_consultation_pipeline():
         logging.info("Trading actions received from Xynth Finance")
 
         await browser.close()
+
+        trading_actions = clean_trading_actions(trading_actions)
 
         return trading_actions
 
