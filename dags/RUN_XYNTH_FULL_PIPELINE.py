@@ -13,7 +13,7 @@ get_logger_config(logging)
 
 @dag(
     dag_id="RUN_XYNTH_FULL_PIPELINE",
-    start_date=datetime.datetime(2025, 6, 4, 16),
+    start_date=datetime.datetime(2025, 6, 5, 15),
     schedule='0 14,15 * * 1-5',  # Every day at 14:00 and 16:00 on weekdays
     catchup=False,
     max_active_runs=1,
