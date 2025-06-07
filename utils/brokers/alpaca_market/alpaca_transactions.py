@@ -67,29 +67,42 @@ def run_place_order_pipeline(trading_actions):
     market_orders = []
 
     for action in trading_actions:
-        symbol = action["stock"]
-        qty = action["position_size"]
-        take_profit = action["target_price"]
-        stop_loss = action["stop_loss"]
 
-        logging.info(f"Placing order for {symbol} with qty={qty}, take_profit={take_profit}, stop_loss={stop_loss}")
-        market_order = place_order(symbol, qty, take_profit, stop_loss)
-        logging.info(f"Order placed - order_id: {market_order.id.urn}")
+        try:
 
-        telegram_message = (
-            f"{dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"Order placed for {symbol}:\n"
-            f"Entry Point: {action['entry_point']}\n"
-            f"Position Size: {qty}\n"
-            f"Take Profit: {take_profit}\n"
-            f"Stop Loss: {stop_loss}\n"
-            f"Expected Duration: {action['expected_duration']}\n"
-            f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
-            f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"
-            f"Order ID: {market_order.id.urn}\n"
-        )
+            symbol = action["stock"]
+            qty = action["position_size"]
+            take_profit = action["target_price"]
+            stop_loss = action["stop_loss"]
 
-        send_telegram_message(telegram_message)
+            logging.info(f"Placing order for {symbol} with qty={qty}, take_profit={take_profit}, stop_loss={stop_loss}")
+            market_order = place_order(symbol, qty, take_profit, stop_loss)
+            logging.info(f"Order placed - order_id: {market_order.id.urn}")
+
+            telegram_message = (
+                f"{dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                f"Order placed for {symbol}:\n"
+                f"Entry Point: {action['entry_point']}\n"
+                f"Position Size: {qty}\n"
+                f"Take Profit: {take_profit}\n"
+                f"Stop Loss: {stop_loss}\n"
+                f"Expected Duration: {action['expected_duration']}\n"
+                f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
+                f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"
+                f"Order ID: {market_order.id.urn}\n"
+            )
+
+            send_telegram_message(telegram_message)
+
+        except Exception as e:
+            logging.error(f"Error placing order for {symbol}: {e}")
+            telegram_message = (
+                f"{dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                f"Error placing order for {symbol}:\n"
+                f"Error: {str(e)}\n"
+            )
+            send_telegram_message(telegram_message)
+            continue
 
 
 if __name__ == "__main__":
