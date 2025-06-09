@@ -33,7 +33,7 @@ async def login_to_xynth(page):
 
 async def select_model(page, model_name):
 
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     # Wait for the model selector to be visible
     await page.wait_for_selector("div.search-bar-model-selector", timeout=30000)
@@ -47,7 +47,7 @@ async def select_model(page, model_name):
     # Click on the model selector and select the desired model
     await page.locator("div.search-bar-model-selector").click()
 
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     badge_spans = await page.locator("div.model-option span").all_inner_texts()
     options = await page.locator(f"div.model-option:has-text('{model_name}')").all()
@@ -68,7 +68,7 @@ async def select_tool(page, tool_name):
 
     try:
 
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         await page.wait_for_selector("div.search-bar-tool-selector", timeout=30000)
 
@@ -80,12 +80,12 @@ async def select_tool(page, tool_name):
         # Click on the tool selector
         await page.locator("div.search-bar-tool-selector").click()
 
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         # Click on the desired tool
         await page.locator(f"div.tool-name:has-text('{tool_name}')").click()
 
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         # Close the tool selector
         await page.locator("div.search-bar-tool-selector").click()
@@ -101,17 +101,17 @@ async def select_tool(page, tool_name):
 
 async def fill_search_bar(page, prompt):
 
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     await page.wait_for_selector("textarea.search-bar-input", timeout=30000)
 
     await page.locator("textarea.search-bar-input").click()
 
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     await page.fill("textarea.search-bar-input", prompt)
 
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     await page.keyboard.press("Enter")
     return
@@ -119,8 +119,8 @@ async def fill_search_bar(page, prompt):
 
 async def send_message(page, total_prompt, model_name, tool_name):
 
-    await select_model(page, STOCK_SCREENING_PROMPT["model_name"])
-    await select_tool(page, STOCK_SCREENING_PROMPT["tool_name"])
+    await select_model(page, model_name)
+    await select_tool(page, tool_name)
     await fill_search_bar(page, total_prompt)
     await page.keyboard.press("Enter")
 
@@ -158,7 +158,7 @@ async def xynth_conversation_handler(page):
     while len(json.loads(re.search(r'\[.*?\]', xynth_responses[-1], re.DOTALL)[0])) == 0:
         retries_count += 1
         logger.info("No trading actions found in the Xynth Finance response. Retrying...")
-        time.sleep(5)
+        await asyncio.sleep(5)
         await send_message(page, RETURN_JSON_PROMPT["prompt"], RETURN_JSON_PROMPT["model_name"], RETURN_JSON_PROMPT["tool_name"])
         xynth_responses = await page.locator("div.message-content-1 div.text-section").all_inner_texts()
 
