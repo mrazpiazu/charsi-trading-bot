@@ -93,7 +93,6 @@ async def send_message(page, total_prompt, model_name, tool_name):
     await select_model(page, model_name)
     await select_tool(page, tool_name)
     await fill_search_bar(page, total_prompt)
-    await page.keyboard.press("Enter")  # Double enter to ensure submission
     return
 
 # Handles full prompt interaction with Xynth and parses trading actions
