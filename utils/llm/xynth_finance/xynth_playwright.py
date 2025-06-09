@@ -153,7 +153,7 @@ def clean_trading_actions(trading_actions):
 
     for action in trading_actions:
         # Validate required fields
-        if not all(key in action for key in ["stock", "entry_point", "stop_loss", "target_price", "expected_duration", "position_size", "potential_profit_loss", "risk_reward_ratio"]):
+        if not all(key in action for key in ["stock", "entry_point", "stop_loss", "stop_loss_limit", "target_price", "expected_duration", "position_size", "potential_profit_loss", "risk_reward_ratio"]):
             logger.error(f"Invalid trading action structure found: {action}")
             continue
         if float(action["stop_loss"]) >= float(action["entry_point"]):

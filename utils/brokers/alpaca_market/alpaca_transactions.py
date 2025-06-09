@@ -19,7 +19,7 @@ get_logger_config(logging)  # Apply project-level logger config
 load_dotenv()  # Load .env variables like API keys
 
 # Places a bracket order (with take profit and stop loss) on Alpaca
-def place_order(symbol, qty, take_profit, stop_loss, paper=True):
+def place_order(symbol, qty, take_profit, stop_loss, stop_loss_limit, paper=True):
     """
     Place an order with Alpaca API.
     """
@@ -35,7 +35,8 @@ def place_order(symbol, qty, take_profit, stop_loss, paper=True):
     )
 
     stop_loss_request = StopLossRequest(
-        stop_price=float(stop_loss)  # Set stop-loss threshold
+        stop_price=float(stop_loss),  # Set stop-loss thresholdç
+        limit_price=float(stop_loss_limit)  # Set stop-loss limit price
     )
 
     # Create a bracket market order with TP and SL
@@ -69,12 +70,13 @@ def run_place_order_pipeline(trading_actions):
         try:
             # Extract trading parameters from action dictionary
             symbol = action["stock"]
-            qty = action["position_size"]
-            take_profit = action["target_price"]
-            stop_loss = action["stop_loss"]
+            qty = action.get("position_size", 1)  # Default to 1 if not specified
+            take_profit = action.get("target_price", action["entry_point"] * 1.05)  # Default to 105% of entry point if not provided
+            stop_loss = action.get("stop_loss", action["entry_point"] * 0.95)  # Default to 95% of entry point if not provided
+            stop_loss_limit = action.get("stop_loss_limit", stop_loss * 1.01)  # Use stop_loss if limit not provided
 
             logging.info(f"Placing order for {symbol} with qty={qty}, take_profit={take_profit}, stop_loss={stop_loss}")
-            market_order = place_order(symbol, qty, take_profit, stop_loss)
+            market_order = place_order(symbol, qty, take_profit, stop_loss, stop_loss_limit)
             logging.info(f"Order placed - order_id: {market_order.id.urn}")  # Log the unique order ID
 
             # Format Telegram notification message
@@ -85,6 +87,7 @@ def run_place_order_pipeline(trading_actions):
                 f"Position Size: {qty}\n"
                 f"Take Profit: {take_profit}\n"
                 f"Stop Loss: {stop_loss}\n"
+                f"Stop Loss Limit: {action.get('stop_loss_limit', 'N/A')}\n"
                 f"Expected Duration: {action['expected_duration']}\n"
                 f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
                 f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"

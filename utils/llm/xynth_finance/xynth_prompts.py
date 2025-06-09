@@ -56,7 +56,7 @@ TECHNICAL_ANALYSIS_PROMPT = {
 DEEP_TECHNICAL_ANALYSIS_PROMPT = {
     "prompt": """Retrieve the 1-month price charts for the stocks we identified earlier and conduct a deep technical analysis with as many indicators as you see fit. Then, identify at least one (could be more if they are great fits) distinct swing trade setups (each one of a particular stock). 
 Have in mind the total budget: {initial_balance}, and ensure that the total position size across all trades does not exceed this amount. Also consider that we do not necessarily need to spend the entire budget, so be flexible with the position sizes.
-For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
+For each trade, include the following details: entry point, stop-loss level, stop-loss limit, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
 Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.
 Regarding risk control, ensure the stop-loss is smaller than the entry point and the target price is larger than the entry point.
 
@@ -70,6 +70,7 @@ DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO
         "stock": "AAPL",
         "entry_point": 150.00,
         "stop_loss": 145.00,
+        "stop_loss_limit": 144.50,
         "target_price": 160.00,
         "expected_duration": "5 days",
         "position_size": 100,
@@ -92,6 +93,7 @@ Please ensure that your response includes a single list of JSONs with the follow
         "stock": "AAPL",
         "entry_point": 150.00,
         "stop_loss": 145.00,
+        "stop_loss_limit": 144.50,
         "target_price": 160.00,
         "expected_duration": "5 days",
         "position_size": 100,
