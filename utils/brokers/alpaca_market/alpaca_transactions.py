@@ -89,6 +89,7 @@ def run_place_order_pipeline(trading_actions):
                 f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
                 f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"
                 f"Order ID: {market_order.id.urn}\n"
+                f"Reasoning: {action.get('reason', 'N/A')}\n"
             )
 
             send_telegram_message(telegram_message)  # Send success message
