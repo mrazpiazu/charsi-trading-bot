@@ -218,7 +218,7 @@ async def run_xynth_consultation_pipeline():
 
         await browser.close()
 
-        # trading_actions = clean_trading_actions(trading_actions)
+        trading_actions = clean_trading_actions(trading_actions)
 
         return trading_actions
 
