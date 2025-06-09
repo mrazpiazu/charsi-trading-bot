@@ -58,6 +58,7 @@ DEEP_TECHNICAL_ANALYSIS_PROMPT = {
 Have in mind the total budget: {initial_balance}, and ensure that the total position size across all trades does not exceed this amount. Also consider that we do not necessarily need to spend the entire budget, so be flexible with the position sizes.
 For each trade, include the following details: entry point, stop-loss level, target price, expected duration, position size (e.g., 100 shares), potential profit/loss in dollars, and the risk-reward ratio. 
 Base each setup on clear technical signals such as patterns, indicators, or price action, and ensure that each trade reflects a unique strategy or technical approach.
+Regarding risk control, ensure the stop-loss is smaller than the entry point and the target price is larger than the entry point.
 
 DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO PROVIDE ME WITH THE TRADE SETUPS.
 DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO PROVIDE ME WITH THE TRADE SETUPS.
