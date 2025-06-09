@@ -74,7 +74,8 @@ DO NOT RESPOND WITH ANY MORE QUESTIONS. YOU HAVE ALL THE INFORMATION YOU NEED TO
         "expected_duration": "5 days",
         "position_size": 100,
         "potential_profit_loss": 1000,
-        "risk_reward_ratio": 2.0
+        "risk_reward_ratio": 2.0,
+        "reason": "High RSI and MACD crossover indicate strong upward momentum"
     }
 ]
 """,
@@ -95,7 +96,8 @@ Please ensure that your response includes a single list of JSONs with the follow
         "expected_duration": "5 days",
         "position_size": 100,
         "potential_profit_loss": 1000,
-        "risk_reward_ratio": 2.0
+        "risk_reward_ratio": 2.0,
+        "reason": "High RSI and MACD crossover indicate strong upward momentum"
     }
 ]""",
     "prompt_name": "Respond with JSON",
