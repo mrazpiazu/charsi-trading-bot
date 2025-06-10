@@ -38,15 +38,12 @@ def send_telegram_report(report_data):
     channel_id = os.getenv('TELEGRAM_TARGET_ID')
 
     # Send plot images
-    for plot in report_data['plots']:
-        plot_path = f"/tmp/{plot.get_label()}.png"
-        plot.savefig(plot_path)
+    for plot_path in report_data['plots']:
 
         with open(plot_path, 'rb') as file:
             url = f"https://api.telegram.org/bot{api_token}/sendPhoto"
             payload = {
-                'chat_id': int(channel_id),
-                'caption': f"{plot.get_label()}"
+                'chat_id': int(channel_id)
             }
             files = {'photo': file}
             response = requests.post(url, data=payload, files=files)
@@ -56,7 +53,7 @@ def send_telegram_report(report_data):
             else:
                 # Remove the file after sending
                 os.remove(plot_path)
-                logger.info(f"Plot {plot.get_label()} sent successfully to Telegram.")
+                logger.info(f"Plot sent successfully to Telegram.")
 
     # Send text report
     text_report = (

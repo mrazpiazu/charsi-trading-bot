@@ -50,13 +50,12 @@ def generate_daily_report(portfolio_history):
     }
 
     for plot in [ax, ax2]:
-        # Append bytes of the jpg image to the report data
         plot_path = f"/tmp/{plot.get_label()}.png"
-        plot.figure.savefig(plot_path, format='png')
-        with open(plot_path, 'rb') as file:
-            report_data["plots"].append(file.read())
-        # Remove the file after reading
-        os.remove(plot_path)
+
+        # Save the plot to a file
+        plot.figure.savefig(plot_path)
+
+        report_data["plots"].append(plot)
 
     return report_data
 
