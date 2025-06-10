@@ -33,10 +33,6 @@ def daily_analysis_dag():
     def get_portfolio_history_task(period_offset_days=7, time_unit="W", time_unit_value=1, timeframe="1D"):
         return get_daily_revenue(period_offset_days, time_unit=time_unit, time_unit_value=time_unit_value, timeframe=timeframe)
 
-    @task(task_id="profit_loss_monthly_analysis")
-    def get_portfolio_history_task():
-        return get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")
-
     @task(task_id="generate_daily_report")
     def generate_report_task(portfolio_history, timeframe="Day"):
         report_data = generate_revenue_report(portfolio_history, timeframe)
