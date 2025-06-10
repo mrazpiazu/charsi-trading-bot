@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import seaborn as sns
 from io import BytesIO
+import base64
 
 from utils.technical_analysis.indicators import *
 import matplotlib.pyplot as plt
@@ -60,7 +61,8 @@ def generate_daily_report(portfolio_history):
         buffer = BytesIO()
         plot.figure.savefig(buffer, format='png')
         buffer.seek(0)
-        report_data["plots"][plot.get_label()] = buffer
+        image_bytes = buffer.read()
+        report_data["plots"][plot.get_label()] = base64.b64encode(image_bytes).decode('utf-8')
 
     return report_data
 

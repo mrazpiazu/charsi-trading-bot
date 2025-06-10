@@ -3,6 +3,7 @@ import dotenv
 import os
 import logging
 import datetime as dt
+import base64
 
 
 logger = logging.getLogger("telegram_connector")
@@ -45,7 +46,7 @@ def send_telegram_report(report_data):
             'chat_id': int(channel_id),
             'caption': f"Plot: {plot}"
         }
-        files = {'photo': report_data['plots'][plot]}
+        files = {'photo': base64.b64decode(report_data['plots'][plot].encode('utf-8'))}
         response = requests.post(url, data=payload, files=files)
 
         if response.status_code != 200:
