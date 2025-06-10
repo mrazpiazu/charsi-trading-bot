@@ -20,8 +20,8 @@ def generate_daily_report(portfolio_history):
 
     sns.set_theme(style="darkgrid")
     ax = sns.lineplot(
-        x=[dt.fromtimestamp(ts) for ts in portfolio_history.timestamp],
-        y=portfolio_history.equity,
+        x=[dt.fromtimestamp(ts) for ts in portfolio_history["timestamp"]],
+        y=portfolio_history["equity"],
         label="Equity"
     )
     ax.set_title("Portfolio Equity Over Time")
@@ -29,11 +29,11 @@ def generate_daily_report(portfolio_history):
     ax.set_ylabel("Equity ($)")
     ax.figure.autofmt_xdate()  # Rotate x-axis labels for better readability
 
-    profit_loss = portfolio_history.profit_loss
+    profit_loss = portfolio_history["profit_loss"]
     profit_loss_changes = [round(profit_loss[i] - profit_loss[i - 1], 2) for i in range(1, len(profit_loss))]
 
     ax2 = sns.barplot(
-        x=[dt.fromtimestamp(ts) for ts in portfolio_history.timestamp[1:]],
+        x=[dt.fromtimestamp(ts) for ts in portfolio_history["timestamp"][1:]],
         y=profit_loss_changes,
         palette=["green" if change >= 0 else "red" for change in profit_loss_changes]
     )
@@ -45,7 +45,7 @@ def generate_daily_report(portfolio_history):
 
     report_data = {
         "total_profit_loss": round(profit_loss[-1], 2),
-        "total_equity": round(portfolio_history.equity[-1], 2),
+        "total_equity": round(portfolio_history["equity"][-1], 2),
         "plots": []
     }
 

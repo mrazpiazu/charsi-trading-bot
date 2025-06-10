@@ -84,11 +84,17 @@ def get_daily_revenue(start_date=None, end_date=None, days=1):
     )
 
     # Fetch daily revenue data
-    daily_revenue = client.get_portfolio_history(
+    daily_revenue_data = client.get_portfolio_history(
         history_filter=request_history_filter  # Apply the request filter
     )
 
-    return daily_revenue.__dict__
+    daily_revenue_data_dict = {
+        "timestamp": [int(ts) for ts in daily_revenue_data.timestamp],
+        "equity": daily_revenue_data.equity,
+        "profit_loss": daily_revenue_data.profit_loss
+    }
+
+    return daily_revenue_data_dict
 
 
 if __name__ == "__main__":
