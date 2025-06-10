@@ -13,6 +13,7 @@ get_logger_config(logging)
 
 
 @dag(
+    dag_id="RUN_DAILY_ANALYSIS",
     start_date=datetime.datetime(2025, 6, 9),
     schedule='15 20 * * 1-5',
     catchup=False,
