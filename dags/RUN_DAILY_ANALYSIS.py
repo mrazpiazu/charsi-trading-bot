@@ -35,11 +35,15 @@ def daily_analysis_dag():
 
     @task(task_id="generate_daily_report")
     def generate_daily_report_task(portfolio_history):
+        context = get_current_context()
+        portfolio_history = portfolio_history.report_data.resolve(context)
         report_data = generate_daily_report(portfolio_history)
         return report_data
 
     @task(task_id="send_telegram_report")
     def send_telegram_report_task(report_data):
+        context = get_current_context()
+        report_data = report_data.resolve(context)
         send_telegram_report(report_data)
 
     portfolio_history = get_portfolio_history_task()
