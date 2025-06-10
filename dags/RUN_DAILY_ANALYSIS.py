@@ -26,10 +26,9 @@ get_logger_config(logging)
     },
     tags=["analysis", "daily", "stocks"]
 )
-def update_stocks_dag():
-    task_id = "profit_loss_daily_analysis"
+def daily_analysis_dag():
 
-    @task(task_id=task_id)
+    @task(task_id="profit_loss_daily_analysis")
     def get_portfolio_history_task():
         return get_daily_revenue()
 
@@ -46,4 +45,4 @@ def update_stocks_dag():
     report_data = generate_daily_report_task(portfolio_history)
     send_telegram_report(report_data)
 
-update_stocks_dag()
+daily_analysis_dag()
