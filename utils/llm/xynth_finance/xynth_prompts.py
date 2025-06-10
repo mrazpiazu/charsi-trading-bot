@@ -3,6 +3,8 @@ STOCK_SCREENING_PROMPT = {
 Focus on finding trades with a favorable risk-to-reward ratio that can be held for several days to weeks. Provide analysis of key support/resistance levels, momentum indicators, and chart patterns that signal potential swing trade setups. Prefer simple, directional trades rather than complex options strategies.
         
 Pay special attention to:
+
+Stocks should mandatorily be in one of these markets: NASDAQ, NYSE, NYSE Arca, CBOE
         
 Technical chart patterns and price action
         
