@@ -73,7 +73,7 @@ def run_place_order_pipeline(trading_actions):
             qty = action.get("position_size", 1)  # Default to 1 if not specified
             take_profit = action.get("target_price", action["entry_point"] * 1.05)  # Default to 105% of entry point if not provided
             stop_loss = action.get("stop_loss", action["entry_point"] * 0.95)  # Default to 95% of entry point if not provided
-            stop_loss_limit = action.get("stop_loss_limit", stop_loss * 1.01)  # Use stop_loss if limit not provided
+            stop_loss_limit = action.get("stop_loss_limit", stop_loss * 0.99)  # Use stop_loss if limit not provided
 
             logging.info(f"Placing order for {symbol} with qty={qty}, take_profit={take_profit}, stop_loss={stop_loss}")
             market_order = place_order(symbol, qty, take_profit, stop_loss, stop_loss_limit)
@@ -88,7 +88,7 @@ def run_place_order_pipeline(trading_actions):
                 f"Take Profit: {take_profit}\n"
                 f"Stop Loss: {stop_loss}\n"
                 f"Stop Loss Limit: {action.get('stop_loss_limit', 'N/A')}\n"
-                f"Expected Duration: {action['expected_duration']}\n"
+                f"Expected Duration Days: {action['expected_duration_days']}\n"
                 f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
                 f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"
                 f"Order ID: {market_order.id.urn}\n"
