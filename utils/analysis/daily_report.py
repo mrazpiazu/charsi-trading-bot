@@ -19,7 +19,7 @@ load_dotenv()  # Load .env variables like API keys
 
 
 # Generated a chart with the portfolio history and sends it to Telegram
-def generate_daily_report(portfolio_history):
+def generate_revenue_report(portfolio_history, timeframe="Day"):
 
     fig1, ax1 = plt.subplots()
     sns.set_theme(style="darkgrid")
@@ -28,7 +28,7 @@ def generate_daily_report(portfolio_history):
         y=portfolio_history["equity"],
         label="Equity"
     )
-    ax1.set_title("Portfolio Equity Over Last Day")
+    ax1.set_title(f"Portfolio Equity Over Last {timeframe}")
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Equity ($)")
     ax1.set_label("equity_plot")
@@ -43,7 +43,7 @@ def generate_daily_report(portfolio_history):
         y=profit_loss_changes,
         palette=["green" if change >= 0 else "red" for change in profit_loss_changes]
     )
-    ax2.set_title("Profit/Loss Changes Over Last Day")
+    ax2.set_title(f"Profit/Loss Changes Over Last {timeframe}")
     ax2.set_xlabel("Date")
     ax2.set_ylabel("Profit/Loss Change ($)")
     ax2.axhline(0, color='black', linewidth=0.8, linestyle='--')  # Draw a horizontal line at y=0

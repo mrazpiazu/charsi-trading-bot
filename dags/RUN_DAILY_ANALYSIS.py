@@ -4,7 +4,7 @@ from airflow.operators.python import get_current_context
 import logging
 
 from utils.brokers.alpaca_market.alpaca_functions import get_daily_revenue
-from utils.analysis.daily_report import generate_daily_report
+from utils.analysis.daily_report import generate_revenue_report
 from utils.telegram.telegram import send_telegram_report
 from utils.logger.logger import get_logger_config
 
@@ -30,20 +30,33 @@ get_logger_config(logging)
 def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
-    def get_portfolio_history_task():
+    def get_portfolio_daily_history_task():
         return get_daily_revenue()
+
+    @task(task_id="profit_loss_monthly_analysis")
+    def get_portfolio_history_task():
+        return get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")
 
     @task(task_id="generate_daily_report")
     def generate_daily_report_task(portfolio_history):
-        report_data = generate_daily_report(portfolio_history)
+        report_data = generate_revenue_report(portfolio_history)
+        return report_data
+
+    @task(task_id="generate_monthly_report)")
+    def generate_monthly_report_task(portfolio_history):
+        report_data = generate_revenue_report(portfolio_history, timeframe="Month")
         return report_data
 
     @task(task_id="send_telegram_report")
     def send_telegram_report_task(report_data):
         send_telegram_report(report_data)
 
-    portfolio_history = get_portfolio_history_task()
-    report_data = generate_daily_report_task(portfolio_history)
-    send_telegram_report_task(report_data)
+    portfolio_history_daily = get_portfolio_daily_history_task()
+    report_data_daily = generate_daily_report_task(portfolio_history_daily)
+    send_telegram_report_task(report_data_daily)
+
+    portfolio_history_monthly = get_portfolio_history_task()
+    report_data_monthly = generate_monthly_report_task(portfolio_history_monthly)
+    send_telegram_report_task(report_data_monthly)
 
 daily_analysis_dag()
