@@ -38,12 +38,13 @@ def send_telegram_report(report_data):
     channel_id = os.getenv('TELEGRAM_TARGET_ID')
 
     # Send plot images
-    for plot_path in report_data['plots']:
+    for plot, plot_path in report_data['plots']:
 
         with open(plot_path, 'rb') as file:
             url = f"https://api.telegram.org/bot{api_token}/sendPhoto"
             payload = {
-                'chat_id': int(channel_id)
+                'chat_id': int(channel_id),
+                'caption': f"Plot: {plot}"
             }
             files = {'photo': file}
             response = requests.post(url, data=payload, files=files)
