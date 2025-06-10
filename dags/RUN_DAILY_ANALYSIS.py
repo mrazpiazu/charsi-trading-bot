@@ -41,7 +41,8 @@ def daily_analysis_dag():
     @task(task_id="send_telegram_report")
     def send_telegram_report_task(report_data):
         context = get_current_context()
-        report_data = report_data.resolve(context)
+        ti = context['task_instance']
+        report_data = ti.xcom_pull(task_ids='generate_daily_report')
         send_telegram_report(report_data)
 
     portfolio_history = get_portfolio_history_task()
