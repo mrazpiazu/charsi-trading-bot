@@ -9,7 +9,7 @@ from io import BytesIO
 
 from utils.technical_analysis.indicators import *
 import matplotlib.pyplot as plt
-from utils.telegram.telegram import send_telegram_message
+from utils.telegram.telegram import send_telegram_message, send_telegram_report
 from utils.logger.logger import get_logger_config
 
 logger = logging.getLogger(__name__)  # Get logger for current module
@@ -42,7 +42,7 @@ def generate_daily_report(portfolio_history):
         y=profit_loss_changes,
         palette=["green" if change >= 0 else "red" for change in profit_loss_changes]
     )
-    ax2.set_title("Daily Profit/Loss Changes")
+    ax2.set_title("Profit/Loss Changes Over Last Day")
     ax2.set_xlabel("Date")
     ax2.set_ylabel("Profit/Loss Change ($)")
     ax2.axhline(0, color='black', linewidth=0.8, linestyle='--')  # Draw a horizontal line at y=0
@@ -71,4 +71,6 @@ if __name__ == "__main__":
 
     portfolio_history = get_daily_revenue()
 
-    generate_daily_report(portfolio_history)
+    report_data = generate_daily_report(portfolio_history)
+
+    send_telegram_report(report_data)
