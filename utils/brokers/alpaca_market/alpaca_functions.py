@@ -105,5 +105,5 @@ if __name__ == "__main__":
     # equity = get_account_equity(client)  # Get current account equity
     # positions = get_account_positions(client)  # Get current account positions
     # orders = get_account_orders(client)  # Get current account orders
-    daily_revenue = get_daily_revenue(period_offset_days=7, time_unit="W", time_unit_value=1, timeframe="1D")  # Get daily revenue
+    daily_revenue = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")  # Get daily revenue
     print("done")
