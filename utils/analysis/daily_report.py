@@ -24,7 +24,7 @@ def generate_daily_report(portfolio_history):
         y=portfolio_history["equity"],
         label="Equity"
     )
-    ax.set_title("Portfolio Equity Over Time")
+    ax.set_title("Portfolio Equity Over Last Day")
     ax.set_xlabel("Date")
     ax.set_ylabel("Equity ($)")
     ax.set_label("equity_plot")
@@ -52,9 +52,9 @@ def generate_daily_report(portfolio_history):
     }
 
     # Save the plots to a temporary directory
-    for plot in [ax.figure, ax2.figure]:
+    for plot in [ax, ax2]:
         plot_path = f"/tmp/{plot.get_label()}.png"
-        plot.savefig(plot_path)
+        plot.figure.savefig(plot_path)
         report_data["plots"].append(plot_path)
 
     return report_data
