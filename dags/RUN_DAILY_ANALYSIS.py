@@ -44,6 +44,6 @@ def daily_analysis_dag():
 
     portfolio_history = get_portfolio_history_task()
     report_data = generate_daily_report_task(portfolio_history)
-    send_telegram_report(report_data)
+    send_telegram_report_task(report_data)
 
 daily_analysis_dag()
