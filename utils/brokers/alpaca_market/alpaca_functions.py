@@ -88,7 +88,7 @@ def get_daily_revenue(start_date=None, end_date=None, days=1):
         history_filter=request_history_filter  # Apply the request filter
     )
 
-    return daily_revenue
+    return daily_revenue.__dict__
 
 
 if __name__ == "__main__":
@@ -98,5 +98,5 @@ if __name__ == "__main__":
     # equity = get_account_equity(client)  # Get current account equity
     # positions = get_account_positions(client)  # Get current account positions
     # orders = get_account_orders(client)  # Get current account orders
-    daily_revenue = get_daily_revenue(client)  # Get daily revenue
+    daily_revenue = get_daily_revenue()  # Get daily revenue
     print("done")
