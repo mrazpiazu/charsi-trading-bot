@@ -27,6 +27,7 @@ def generate_daily_report(portfolio_history):
     ax.set_title("Portfolio Equity Over Time")
     ax.set_xlabel("Date")
     ax.set_ylabel("Equity ($)")
+    ax.set_label("equity_plot")
     ax.figure.autofmt_xdate()  # Rotate x-axis labels for better readability
 
     profit_loss = portfolio_history["profit_loss"]
@@ -41,6 +42,7 @@ def generate_daily_report(portfolio_history):
     ax2.set_xlabel("Date")
     ax2.set_ylabel("Profit/Loss Change ($)")
     ax2.axhline(0, color='black', linewidth=0.8, linestyle='--')  # Draw a horizontal line at y=0
+    ax2.set_label("profit_loss_plot")
     ax2.figure.autofmt_xdate()  # Rotate x-axis labels for better readability
 
     report_data = {
