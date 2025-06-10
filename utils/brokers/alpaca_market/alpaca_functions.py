@@ -73,6 +73,10 @@ def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time
     if start_date is None:
         # start_date = dt.now().replace(hour=0, minute=0, second=0, microsecond=0) # Default to 00:00:00 today
         start_date = dt.now() - timedelta(days=period_offset_days) # Default to 00:00:00 today
+
+        if period_offset_days == 0:
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+
     if end_date is None:
         end_date = dt.now()  # Default to today
 
