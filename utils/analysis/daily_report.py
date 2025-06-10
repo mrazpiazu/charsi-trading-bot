@@ -46,11 +46,14 @@ def generate_daily_report(portfolio_history):
     report_data = {
         "total_profit_loss": round(profit_loss[-1], 2),
         "total_equity": round(portfolio_history.equity[-1], 2),
-        "plots": [
-            ax.figure,
-            ax2.figure
-        ]
+        "plots": []
     }
+
+    # Save the plots to a temporary directory
+    for plot in [ax.figure, ax2.figure]:
+        plot_path = f"/tmp/{plot.get_label()}.png"
+        plot.savefig(plot_path)
+        report_data["plots"].append(plot_path)
 
     return report_data
 
