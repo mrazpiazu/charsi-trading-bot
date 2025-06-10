@@ -35,8 +35,8 @@ def place_order(symbol, qty, take_profit, stop_loss, stop_loss_limit, paper=True
     )
 
     stop_loss_request = StopLossRequest(
-        stop_price=float(stop_loss),  # Set stop-loss thresholdç
-        limit_price=float(stop_loss_limit)  # Set stop-loss limit price
+        stop_price=float(stop_loss)  # Set stop-loss thresholdç
+        # limit_price=float(stop_loss_limit)  # Set stop-loss limit price
     )
 
     # Create a bracket market order with TP and SL
@@ -87,7 +87,7 @@ def run_place_order_pipeline(trading_actions):
                 f"Position Size: {qty}\n"
                 f"Take Profit: {take_profit}\n"
                 f"Stop Loss: {stop_loss}\n"
-                f"Stop Loss Limit: {action.get('stop_loss_limit', 'N/A')}\n"
+                # f"Stop Loss Limit: {action.get('stop_loss_limit', 'N/A')}\n"
                 f"Expected Duration Days: {action['expected_duration_days']}\n"
                 f"Potential Profit/Loss: {action['potential_profit_loss']}\n"
                 f"Risk/Reward Ratio: {action['risk_reward_ratio']}\n"
