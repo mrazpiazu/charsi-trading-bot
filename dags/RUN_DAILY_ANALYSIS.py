@@ -30,7 +30,7 @@ get_logger_config(logging)
 def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
-    def get_portfolio_history_task(period_offset_days=7, time_unit="W", time_unit_value=1, timeframe="1D"):
+    def get_portfolio_history_task(period_offset_days=1, time_unit="D", time_unit_value=1, timeframe="1D"):
         return get_daily_revenue(period_offset_days=period_offset_days, time_unit=time_unit, time_unit_value=time_unit_value, timeframe=timeframe)
 
     @task(task_id="generate_daily_report")
@@ -41,13 +41,16 @@ def daily_analysis_dag():
     @task(task_id="send_telegram_report")
     def send_telegram_report_task(report_data):
         send_telegram_report(report_data)
+        return
 
     portfolio_history_daily = get_portfolio_history_task()
     report_data_daily = generate_report_task(portfolio_history_daily)
-    send_telegram_report_task(report_data_daily)
+    send_report_daily = send_telegram_report_task(report_data_daily)
 
     portfolio_history_monthly = get_portfolio_history_task(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")
     report_data_monthly = generate_report_task(portfolio_history_monthly, "Month")
-    send_telegram_report_task(report_data_monthly)
+    send_report_monthly = send_telegram_report_task(report_data_monthly)
+
+    send_report_monthly >> portfolio_history_daily
 
 daily_analysis_dag()
