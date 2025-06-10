@@ -5,6 +5,7 @@ import logging
 import os
 from dotenv import load_dotenv
 import seaborn as sns
+from io import BytesIO
 
 from utils.technical_analysis.indicators import *
 import matplotlib.pyplot as plt
@@ -56,10 +57,10 @@ def generate_daily_report(portfolio_history):
 
     # Save the plots to a temporary directory
     for plot in [ax1, ax2]:
-        plot_path = f"/tmp/{plot.get_label()}.png" # For production use
-        # plot_path = f"{plot.get_label()}" # For local testing
-        plot.figure.savefig(plot_path)
-        report_data["plots"][plot.get_label()] = plot_path
+        buffer = BytesIO()
+        plot.figure.savefig(buffer, format='png')
+        buffer.seek(0)
+        report_data["plots"][plot.get_label()] = buffer
 
     return report_data
 
