@@ -30,7 +30,7 @@ get_logger_config(logging)
 def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
-    def get_portfolio_history_task(period_offset_days=1, time_unit="H", time_unit_value=1, timeframe="1D"):
+    def get_portfolio_history_task(period_offset_days=1, time_unit="D", time_unit_value=1, timeframe="1H"):
         return get_daily_revenue(period_offset_days=period_offset_days, time_unit=time_unit, time_unit_value=time_unit_value, timeframe=timeframe)
 
     @task(task_id="generate_daily_report")
