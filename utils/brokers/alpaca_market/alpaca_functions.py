@@ -63,12 +63,15 @@ def get_account_orders(client):
     return orders
 
 
-def get_daily_revenue(client, start_date=None, end_date=None, days=1):
+def get_daily_revenue(start_date=None, end_date=None, days=1):
     """
     Get daily revenue from Alpaca account.
     """
+
+    client = create_client(paper=True)
+
     if start_date is None:
-        start_date = dt.now().replace(hour=0, minute=0, second=0, microsecond=0) # Default to yesterday
+        start_date = dt.now().replace(hour=0, minute=0, second=0, microsecond=0) # Default to 00:00:00 today
     if end_date is None:
         end_date = dt.now()  # Default to today
 
