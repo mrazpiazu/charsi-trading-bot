@@ -74,3 +74,10 @@ def send_telegram_report(report_data):
         logger.info("Text report sent successfully to Telegram.")
 
     return
+
+
+if __name__ == "__main__":
+
+    message = "test"
+
+    send_telegram_message(message)
