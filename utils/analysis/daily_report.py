@@ -73,6 +73,6 @@ if __name__ == "__main__":
 
     portfolio_history = get_daily_revenue()
 
-    report_data = generate_daily_report(portfolio_history)
+    report_data = generate_revenue_report(portfolio_history)
 
     send_telegram_report(report_data)
