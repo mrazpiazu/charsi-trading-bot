@@ -51,7 +51,7 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
     fig2.autofmt_xdate()  # Rotate x-axis labels for better readability
 
     report_data = {
-        "total_profit_loss": round(profit_loss[-1], 2),
+        "total_profit_loss": round(portfolio_history["profit_loss"][-1] - portfolio_history["profit_loss"][0], 2),
         "total_equity": round(portfolio_history["equity"][-1], 2),
         "plots": {}
     }
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     from utils.brokers.alpaca_market.alpaca_functions import get_daily_revenue
 
-    portfolio_history = get_daily_revenue()
+    portfolio_history = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H")
 
     report_data = generate_revenue_report(portfolio_history)
 

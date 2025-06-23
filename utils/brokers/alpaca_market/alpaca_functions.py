@@ -95,6 +95,7 @@ def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time
 
     daily_revenue_data_dict = {
         "timestamp": [int(ts) for ts in daily_revenue_data.timestamp],
+        "datetime": [dt.fromtimestamp(ts) for ts in daily_revenue_data.timestamp],
         "equity": daily_revenue_data.equity,
         "profit_loss": daily_revenue_data.profit_loss
     }
@@ -109,5 +110,6 @@ if __name__ == "__main__":
     # equity = get_account_equity(client)  # Get current account equity
     # positions = get_account_positions(client)  # Get current account positions
     # orders = get_account_orders(client)  # Get current account orders
-    daily_revenue = get_daily_revenue(period_offset_days=1, time_unit="H", time_unit_value=1, timeframe="1D")  # Get daily revenue
+    daily_revenue = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H")  # Get daily revenue
+    monthly_revenue = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")  # Get daily revenue
     print("done")
