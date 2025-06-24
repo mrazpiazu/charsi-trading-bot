@@ -58,8 +58,8 @@ def send_telegram_report(report_data):
     # Send text report
     text_report = (
         f"{dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        f"Total Profit/Loss: ${report_data['total_profit_loss']}\n"
-        f"Total Equity: ${report_data['total_equity']}\n"
+        f"Total Profit/Loss End: ${report_data['total_profit_loss']}\n"
+        f"Total Equity End: ${report_data['total_equity']}\n"
         f"Max Equity: ${report_data['max_equity']}\n"
         f"Min Equity: ${report_data['min_equity']}\n"
         f"Avg Equity: ${report_data['avg_equity']}\n"
