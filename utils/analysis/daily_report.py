@@ -19,7 +19,7 @@ load_dotenv()  # Load .env variables like API keys
 
 
 # Generated a chart with the portfolio history and sends it to Telegram
-def generate_revenue_report(portfolio_history, timeframe="Day"):
+def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
 
     sns.set_theme(style="darkgrid")
 
@@ -41,6 +41,8 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
     ax1.set_ylabel("Equity ($)")
     ax1.set_label("equity_plot")
     fig1.autofmt_xdate()
+    if test == True:
+        plt.show()
 
 
     # CHART 2 (profit_loss)
@@ -75,6 +77,9 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
     ax2.set_label("profit_loss_plot")
     plt.tight_layout()
 
+    if test == True:
+        plt.show()
+
     report_data = {
         "total_profit_loss": round(portfolio_history["profit_loss"][-1] - portfolio_history["profit_loss"][0], 2),
         "total_equity": round(portfolio_history["equity"][-1], 2),
@@ -104,6 +109,6 @@ if __name__ == "__main__":
 
     portfolio_history = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H")
 
-    report_data = generate_revenue_report(portfolio_history)
+    report_data = generate_revenue_report(portfolio_history, test=True)
 
     send_telegram_report(report_data)
