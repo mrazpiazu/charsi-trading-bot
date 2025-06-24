@@ -53,6 +53,12 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
     report_data = {
         "total_profit_loss": round(portfolio_history["profit_loss"][-1] - portfolio_history["profit_loss"][0], 2),
         "total_equity": round(portfolio_history["equity"][-1], 2),
+        "max_equity": round(max(portfolio_history["equity"]), 2),
+        "min_equity": round(min(portfolio_history["equity"]), 2),
+        "avg_equity": round(sum(portfolio_history["equity"]) / len(portfolio_history["equity"]), 2),
+        "max_profit_loss": round(max(portfolio_history["profit_loss"]), 2),
+        "min_profit_loss": round(min(portfolio_history["profit_loss"]), 2),
+        "avg_profit_loss": round(sum(portfolio_history["profit_loss"]) / len(portfolio_history["profit_loss"]), 2),
         "plots": {}
     }
 

@@ -60,6 +60,12 @@ def send_telegram_report(report_data):
         f"{dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
         f"Total Profit/Loss: ${report_data['total_profit_loss']}\n"
         f"Total Equity: ${report_data['total_equity']}\n"
+        f"Max Equity: ${report_data['max_equity']}\n"
+        f"Min Equity: ${report_data['min_equity']}\n"
+        f"Avg Equity: ${report_data['avg_equity']}\n"
+        f"Max Profit/Loss: ${report_data['max_profit_loss']}\n"
+        f"Min Profit/Loss: ${report_data['min_profit_loss']}\n"
+        f"Avg Profit/Loss: ${report_data['avg_profit_loss']}\n"
     )
 
     url = f"https://api.telegram.org/bot{api_token}/sendMessage"
