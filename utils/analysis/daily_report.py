@@ -23,17 +23,15 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
 
     sns.set_theme(style="darkgrid")
 
-    # ==== FIGURA 1: Portfolio Equity ====
+    # CHART 1 (equity_plot)
     fig1, ax1 = plt.subplots()
 
     timestamps = [dt.fromtimestamp(ts) for ts in portfolio_history["timestamp"]]
     y = np.array(portfolio_history["equity"])
     x = np.arange(len(timestamps))
 
-    # Línea de equity
     sns.lineplot(x=timestamps, y=y, label="Equity", ax=ax1)
 
-    # Línea de tendencia
     slope, intercept = np.polyfit(x, y, 1)
     trend = slope * x + intercept
     sns.lineplot(x=timestamps, y=trend, label="Tendency", color='orange', linestyle='--', ax=ax1)
@@ -45,7 +43,7 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
     fig1.autofmt_xdate()
 
 
-    # ==== FIGURA 2: Profit/Loss Changes ====
+    # CHART 2 (profit_loss)
     profit_loss = portfolio_history["profit_loss"]
     profit_loss_changes = [round(profit_loss[i] - profit_loss[i - 1], 2) for i in range(1, len(profit_loss))]
 
@@ -54,9 +52,8 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
     raw_timestamps = portfolio_history["timestamp"][1:]
     readable_dates = [dt.fromtimestamp(ts).strftime('%Y-%m-%d') for ts in raw_timestamps]
     y = np.array(profit_loss_changes)
-    x = np.arange(len(y))  # índice numérico para evitar problemas con fechas
+    x = np.arange(len(y))
 
-    # Gráfico de barras con índice como eje X
     sns.barplot(
         x=x,
         y=y,
@@ -64,12 +61,11 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
         ax=ax2
     )
 
-    # Línea de tendencia
     slope, intercept = np.polyfit(x, y, 1)
     trend = slope * x + intercept
     sns.lineplot(x=x, y=trend, label="Tendency", color='orange', linestyle='--', ax=ax2)
 
-    # Configuración de eje y etiquetas
+    # Chart 2
     ax2.set_xticks(x)
     ax2.set_xticklabels(readable_dates, rotation=45)
     ax2.axhline(0, color='black', linewidth=0.8, linestyle='--')
