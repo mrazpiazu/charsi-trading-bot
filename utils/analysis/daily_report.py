@@ -21,34 +21,63 @@ load_dotenv()  # Load .env variables like API keys
 # Generated a chart with the portfolio history and sends it to Telegram
 def generate_revenue_report(portfolio_history, timeframe="Day"):
 
-    fig1, ax1 = plt.subplots()
     sns.set_theme(style="darkgrid")
-    sns.lineplot(
-        x=[dt.fromtimestamp(ts) for ts in portfolio_history["timestamp"]],
-        y=portfolio_history["equity"],
-        label="Equity"
-    )
+
+    # ==== FIGURA 1: Portfolio Equity ====
+    fig1, ax1 = plt.subplots()
+
+    timestamps = [dt.fromtimestamp(ts) for ts in portfolio_history["timestamp"]]
+    y = np.array(portfolio_history["equity"])
+    x = np.arange(len(timestamps))
+
+    # Línea de equity
+    sns.lineplot(x=timestamps, y=y, label="Equity", ax=ax1)
+
+    # Línea de tendencia
+    slope, intercept = np.polyfit(x, y, 1)
+    trend = slope * x + intercept
+    sns.lineplot(x=timestamps, y=trend, label="Tendency", color='orange', linestyle='--', ax=ax1)
+
     ax1.set_title(f"Portfolio Equity Over Last {timeframe}")
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Equity ($)")
     ax1.set_label("equity_plot")
-    fig1.autofmt_xdate()  # Rotate x-axis labels for better readability
+    fig1.autofmt_xdate()
 
+
+    # ==== FIGURA 2: Profit/Loss Changes ====
     profit_loss = portfolio_history["profit_loss"]
     profit_loss_changes = [round(profit_loss[i] - profit_loss[i - 1], 2) for i in range(1, len(profit_loss))]
 
     fig2, ax2 = plt.subplots()
+
+    raw_timestamps = portfolio_history["timestamp"][1:]
+    readable_dates = [dt.fromtimestamp(ts).strftime('%Y-%m-%d') for ts in raw_timestamps]
+    y = np.array(profit_loss_changes)
+    x = np.arange(len(y))  # índice numérico para evitar problemas con fechas
+
+    # Gráfico de barras con índice como eje X
     sns.barplot(
-        x=[dt.fromtimestamp(ts) for ts in portfolio_history["timestamp"][1:]],
-        y=profit_loss_changes,
-        palette=["green" if change >= 0 else "red" for change in profit_loss_changes]
+        x=x,
+        y=y,
+        palette=["green" if change >= 0 else "red" for change in y],
+        ax=ax2
     )
+
+    # Línea de tendencia
+    slope, intercept = np.polyfit(x, y, 1)
+    trend = slope * x + intercept
+    sns.lineplot(x=x, y=trend, label="Tendency", color='orange', linestyle='--', ax=ax2)
+
+    # Configuración de eje y etiquetas
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(readable_dates, rotation=45)
+    ax2.axhline(0, color='black', linewidth=0.8, linestyle='--')
     ax2.set_title(f"Profit/Loss Changes Over Last {timeframe}")
     ax2.set_xlabel("Date")
     ax2.set_ylabel("Profit/Loss Change ($)")
-    ax2.axhline(0, color='black', linewidth=0.8, linestyle='--')  # Draw a horizontal line at y=0
     ax2.set_label("profit_loss_plot")
-    fig2.autofmt_xdate()  # Rotate x-axis labels for better readability
+    plt.tight_layout()
 
     report_data = {
         "total_profit_loss": round(portfolio_history["profit_loss"][-1] - portfolio_history["profit_loss"][0], 2),
@@ -56,9 +85,9 @@ def generate_revenue_report(portfolio_history, timeframe="Day"):
         "max_equity": round(max(portfolio_history["equity"]), 2),
         "min_equity": round(min(portfolio_history["equity"]), 2),
         "avg_equity": round(sum(portfolio_history["equity"]) / len(portfolio_history["equity"]), 2),
-        "max_profit_loss": round(max(portfolio_history["profit_loss"]), 2),
-        "min_profit_loss": round(min(portfolio_history["profit_loss"]), 2),
-        "avg_profit_loss": round(sum(portfolio_history["profit_loss"]) / len(portfolio_history["profit_loss"]), 2),
+        "max_profit_loss": round(max(profit_loss_changes), 2),
+        "min_profit_loss": round(min(profit_loss_changes), 2),
+        "avg_profit_loss": round(sum(profit_loss_changes) / len(profit_loss_changes), 2),
         "plots": {}
     }
 
