@@ -2,6 +2,7 @@ import time
 from datetime import datetime as dt, timedelta
 import datetime
 import logging
+import pandas as pd
 import os
 from dotenv import load_dotenv
 from alpaca.trading.client import TradingClient
@@ -98,6 +99,20 @@ def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time
         "profit_loss": daily_revenue_data.profit_loss
     }
 
+    df = pd.DataFrame(daily_revenue_data_dict)
+
+    if period_offset_days != 1:
+        df['date'] = df['datetime'].dt.date
+        df_daily_revenue = df.groupby('date').agg({
+            'equity': 'mean',
+            'profit_loss': 'mean'
+        }).reset_index()
+        df_daily_revenue['timestamp'] = df_daily_revenue['date'].apply(lambda x: int(dt.combine(x, dt.min.time()).timestamp()))
+    else:
+        df_daily_revenue = df
+
+    daily_revenue_data_dict = df_daily_revenue.to_dict('list')
+
     return daily_revenue_data_dict
 
 
@@ -108,6 +123,6 @@ if __name__ == "__main__":
     # equity = get_account_equity(client)  # Get current account equity
     # positions = get_account_positions(client)  # Get current account positions
     # orders = get_account_orders(client)  # Get current account orders
-    daily_revenue = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H")  # Get daily revenue
-    monthly_revenue = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")  # Get daily revenue
+    daily_revenue = get_daily_revenue(period_offset_days=0, timeframe="1H")  # Get daily revenue
+    monthly_revenue = get_daily_revenue(period_offset_days=30, timeframe="1D")  # Get daily revenue
     print("done")
