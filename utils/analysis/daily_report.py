@@ -108,7 +108,7 @@ if __name__ == "__main__":
     from utils.brokers.alpaca_market.alpaca_functions import get_daily_revenue
 
     # portfolio_history = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H")
-    portfolio_history = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")
+    portfolio_history = get_daily_revenue(period_offset_days=30, timeframe="1D")
 
     report_data = generate_revenue_report(portfolio_history, test=True)
 

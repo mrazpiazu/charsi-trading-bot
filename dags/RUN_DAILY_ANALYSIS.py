@@ -15,7 +15,7 @@ get_logger_config(logging)
 @dag(
     dag_id="RUN_DAILY_ANALYSIS",
     start_date=datetime.datetime(2025, 6, 9),
-    schedule='15 10 * * 1-5',
+    schedule='0 7 * * 1-5',
     catchup=False,
     max_active_runs=1,
     default_args={
@@ -30,8 +30,8 @@ get_logger_config(logging)
 def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
-    def get_portfolio_history_task(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H"):
-        return get_daily_revenue(period_offset_days=period_offset_days, time_unit=time_unit, time_unit_value=time_unit_value, timeframe=timeframe)
+    def get_portfolio_history_task(period_offset_days=0, timeframe="1H"):
+        return get_daily_revenue(period_offset_days=period_offset_days, timeframe=timeframe)
 
     @task(task_id="generate_daily_report")
     def generate_report_task(portfolio_history, timeframe="Day"):
@@ -47,7 +47,7 @@ def daily_analysis_dag():
     report_data_daily = generate_report_task(portfolio_history_daily)
     send_report_daily = send_telegram_report_task(report_data_daily)
 
-    portfolio_history_monthly = get_portfolio_history_task(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")
+    portfolio_history_monthly = get_portfolio_history_task(period_offset_days=30, timeframe="1D")
     report_data_monthly = generate_report_task(portfolio_history_monthly, "Month")
     send_report_monthly = send_telegram_report_task(report_data_monthly)
 

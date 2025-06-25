@@ -63,7 +63,7 @@ def get_account_orders(client):
     return orders
 
 
-def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time_unit="W", time_unit_value=1, timeframe="1D"):
+def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, timeframe="1D"):
     """
     Get daily revenue from Alpaca account.
     """
@@ -71,20 +71,19 @@ def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time
     client = create_client(paper=True)
 
     if start_date is None:
-        start_date = (dt.now() - timedelta(days=period_offset_days)).replace(hour=0, minute=0, second=0, microsecond=0)
+        start_date = dt.now() - timedelta(days=period_offset_days) # Default to 00:00:00 today
 
         if period_offset_days == 0:
             start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
     if end_date is None:
-        end_date = dt.now()  # Default to today
+        end_date = dt.now()
 
     request_history_filter = GetPortfolioHistoryRequest(
-        period=f"{time_unit_value}{time_unit}",  # Daily data
-        start=start_date,  # Start date
-        # date_end=end_date,  # End date
-        extended_hours=True,
-        timeframe=timeframe,  # Timeframe for daily data
+        start=start_date,
+        end=end_date,
+        timeframe=timeframe,
+        extended_hours=False
     )
 
     # Fetch daily revenue data
