@@ -15,7 +15,7 @@ get_logger_config(logging)
 @dag(
     dag_id="RUN_DAILY_ANALYSIS",
     start_date=datetime.datetime(2025, 6, 9),
-    schedule='15 10 * * 1-5',
+    schedule='15 10 * * *',
     catchup=False,
     max_active_runs=1,
     default_args={
