@@ -1,6 +1,7 @@
 import datetime
 from airflow.decorators import dag, task
 from airflow.operators.python import get_current_context
+from airflow.exceptions import AirflowSkipException
 import logging
 
 from utils.brokers.alpaca_market.alpaca_functions import get_daily_revenue
@@ -15,7 +16,7 @@ get_logger_config(logging)
 @dag(
     dag_id="RUN_DAILY_ANALYSIS",
     start_date=datetime.datetime(2025, 6, 9),
-    schedule='15 10 * * 2-6',
+    schedule='15 10 * * *',
     catchup=False,
     max_active_runs=1,
     default_args={
@@ -31,12 +32,21 @@ def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
     def get_portfolio_history_task(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H"):
-        return get_daily_revenue(period_offset_days=period_offset_days, time_unit=time_unit, time_unit_value=time_unit_value, timeframe=timeframe)
+        execution_date = get_current_context()["logical_date"]
+        weekday = execution_date.weekday()
+        if weekday in [0, 6]:  # Monday or Sunday
+            logger.info("Skipping daily analysis on Sunday or Monday.")
+            raise AirflowSkipException("Daily analysis skipped on Sunday or Monday")
+        return get_daily_revenue(
+            period_offset_days=period_offset_days,
+            time_unit=time_unit,
+            time_unit_value=time_unit_value,
+            timeframe=timeframe
+        )
 
     @task(task_id="generate_daily_report")
     def generate_report_task(portfolio_history, timeframe="Day"):
-        report_data = generate_revenue_report(portfolio_history, timeframe)
-        return report_data
+        return generate_revenue_report(portfolio_history, timeframe)
 
     @task(task_id="send_telegram_report")
     def send_telegram_report_task(report_data):
