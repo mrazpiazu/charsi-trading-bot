@@ -32,7 +32,7 @@ def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
     def get_portfolio_history_task(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H"):
-        execution_date = get_current_context()["logical_date"]
+        execution_date = get_current_context()["logical_date"] + datetime.timedelta(days=1)
         weekday = execution_date.weekday()
         if weekday in [0, 6]:  # Monday or Sunday
             logger.info("Skipping daily analysis on Sunday or Monday.")
