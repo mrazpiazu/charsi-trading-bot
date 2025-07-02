@@ -28,7 +28,7 @@ def create_client(paper=True, budget=False):
         secret_key = os.getenv("ALPACA_API_SECRET_KEY")
     else:
         api_key = os.getenv("ALPACA_PAPER_API_KEY_BUDGET")
-        secret_key = os.getenv("ALPACA_PAPER_API_SECRET_BUDGET")
+        secret_key = os.getenv("ALPACA_PAPER_API_SECRET_KEY_BUDGET")
 
     return TradingClient(
         api_key=api_key,  # API key from environment
