@@ -70,7 +70,6 @@ def daily_analysis_dag():
     report_data_monthly_budget = generate_report_task(portfolio_history_monthly_budget, "Month")
     send_report_monthly_budget = send_telegram_report_task(report_data_monthly_budget)
 
-    send_report_monthly >> portfolio_history_daily
-    send_report_monthly_budget >> portfolio_history_daily_budget
+    send_report_monthly >> portfolio_history_daily >> send_report_monthly_budget >> portfolio_history_daily_budget
 
 daily_analysis_dag()
