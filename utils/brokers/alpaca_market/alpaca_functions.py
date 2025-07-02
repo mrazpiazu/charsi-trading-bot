@@ -19,13 +19,20 @@ load_dotenv()  # Load .env variables like API keys
 
 
 # Create client
-def create_client(paper=True):
+def create_client(paper=True, budget=False):
     """
     Create an Alpaca TradingClient instance.
     """
+    if not budget:
+        api_key = os.getenv("ALPACA_API_KEY_ID")
+        secret_key = os.getenv("ALPACA_API_SECRET_KEY")
+    else:
+        api_key = os.getenv("ALPACA_PAPER_API_KEY_BUDGET")
+        secret_key = os.getenv("ALPACA_PAPER_API_SECRET_BUDGET")
+
     return TradingClient(
-        api_key=os.getenv("ALPACA_API_KEY_ID"),  # API key from environment
-        secret_key=os.getenv("ALPACA_API_SECRET_KEY"),  # Secret key from environment
+        api_key=api_key,  # API key from environment
+        secret_key=secret_key,  # Secret key from environment
         paper=paper  # Use paper trading if True
     )
 
@@ -63,12 +70,12 @@ def get_account_orders(client):
     return orders
 
 
-def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time_unit="W", time_unit_value=1, timeframe="1D"):
+def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time_unit="W", time_unit_value=1, timeframe="1D", budget=False):
     """
     Get daily revenue from Alpaca account.
     """
 
-    client = create_client(paper=True)
+    client = create_client(paper=True, budget=budget)
 
     if start_date is None:
         start_date = (dt.now() - timedelta(days=period_offset_days)).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -104,11 +111,11 @@ def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time
 
 if __name__ == "__main__":
     # Example usage
-    client = create_client(paper=True)  # Create a paper trading client
+    client = create_client(paper=True, budget=False)  # Create a paper trading client
     # balance = get_account_balance(client)  # Get current account balance
     # equity = get_account_equity(client)  # Get current account equity
     # positions = get_account_positions(client)  # Get current account positions
     # orders = get_account_orders(client)  # Get current account orders
-    daily_revenue = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H")  # Get daily revenue
-    monthly_revenue = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D")  # Get daily revenue
+    daily_revenue = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H", budget=False)  # Get daily revenue
+    monthly_revenue = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D", budget=False)  # Get daily revenue
     print("done")

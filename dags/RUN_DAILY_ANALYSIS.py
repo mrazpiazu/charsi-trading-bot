@@ -31,7 +31,7 @@ get_logger_config(logging)
 def daily_analysis_dag():
 
     @task(task_id="profit_loss_daily_analysis")
-    def get_portfolio_history_task(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H"):
+    def get_portfolio_history_task(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H", budget=False):
         execution_date = get_current_context()["logical_date"] + datetime.timedelta(days=1)
         weekday = execution_date.weekday()
         if weekday in [0, 6]:  # Monday or Sunday
@@ -41,7 +41,8 @@ def daily_analysis_dag():
             period_offset_days=period_offset_days,
             time_unit=time_unit,
             time_unit_value=time_unit_value,
-            timeframe=timeframe
+            timeframe=timeframe,
+            budget=budget
         )
 
     @task(task_id="generate_daily_report")
@@ -61,6 +62,15 @@ def daily_analysis_dag():
     report_data_monthly = generate_report_task(portfolio_history_monthly, "Month")
     send_report_monthly = send_telegram_report_task(report_data_monthly)
 
+    portfolio_history_daily_budget = get_portfolio_history_task(budget=False)
+    report_data_daily_budget = generate_report_task(portfolio_history_daily_budget)
+    send_report_daily_budget = send_telegram_report_task(report_data_daily_budget)
+
+    portfolio_history_monthly_budget = get_portfolio_history_task(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D", budget=False)
+    report_data_monthly_budget = generate_report_task(portfolio_history_monthly_budget, "Month")
+    send_report_monthly_budget = send_telegram_report_task(report_data_monthly_budget)
+
     send_report_monthly >> portfolio_history_daily
+    send_report_monthly_budget >> portfolio_history_daily_budget
 
 daily_analysis_dag()
