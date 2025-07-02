@@ -62,11 +62,11 @@ def daily_analysis_dag():
     report_data_monthly = generate_report_task(portfolio_history_monthly, "Month")
     send_report_monthly = send_telegram_report_task(report_data_monthly)
 
-    portfolio_history_daily_budget = get_portfolio_history_task(budget=False)
+    portfolio_history_daily_budget = get_portfolio_history_task(budget=True)
     report_data_daily_budget = generate_report_task(portfolio_history_daily_budget)
     send_report_daily_budget = send_telegram_report_task(report_data_daily_budget)
 
-    portfolio_history_monthly_budget = get_portfolio_history_task(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D", budget=False)
+    portfolio_history_monthly_budget = get_portfolio_history_task(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D", budget=True)
     report_data_monthly_budget = generate_report_task(portfolio_history_monthly_budget, "Month")
     send_report_monthly_budget = send_telegram_report_task(report_data_monthly_budget)
 
