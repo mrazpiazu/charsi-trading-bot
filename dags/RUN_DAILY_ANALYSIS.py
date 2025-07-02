@@ -12,6 +12,7 @@ from utils.logger.logger import get_logger_config
 logger = logging.getLogger("daily_analysis_dag")
 get_logger_config(logging)
 
+
 @dag(
     dag_id="RUN_DAILY_ANALYSIS",
     start_date=datetime.datetime(2025, 6, 9),
@@ -69,6 +70,7 @@ def daily_analysis_dag():
     report_data_monthly_budget = generate_report_task(portfolio_history_monthly_budget, "Month")
     send_report_monthly_budget = send_telegram_report_task(report_data_monthly_budget)
 
-    [send_report_daily, send_report_monthly] >> portfolio_history_daily_budget
+    send_report_monthly >> portfolio_history_daily
+    send_report_monthly_budget >> portfolio_history_daily_budget
 
 daily_analysis_dag()
