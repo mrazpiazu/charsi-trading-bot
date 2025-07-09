@@ -96,7 +96,7 @@ def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
         "min_profit_loss": round(min(profit_loss_changes), 2),
         "avg_profit_loss": round(sum(profit_loss_changes) / len(profit_loss_changes), 2),
         "avg_interest_rate": round(sum(interest_rates) / len(interest_rates), 2),
-        "final_interest_rate": round((portfolio_history["equity"][-1] / portfolio_history["equity"][0] - 1) * 100, 2) * 100,
+        "final_interest_rate": round(((portfolio_history["equity"][-1] / portfolio_history["equity"][0]) - 1) * 100, 2),
         "plots": {}
     }
 
