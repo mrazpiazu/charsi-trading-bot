@@ -99,11 +99,25 @@ def get_daily_revenue(start_date=None, end_date=None, period_offset_days=7, time
         history_filter=request_history_filter  # Apply the request filter
     )
 
+    # Get equity after first non 0.0 value
+    # Get equity starting from the first non-0.0 value
+    equity_list = daily_revenue_data.equity
+    first_non_zero_index = next((i for i, v in enumerate(equity_list) if v != 0.0), None)
+    equity = equity_list[first_non_zero_index:] if first_non_zero_index is not None else []
+
+    # Remove timestamps until the first non-0.0 equity value
+    timestamps = daily_revenue_data.timestamp[first_non_zero_index:] if first_non_zero_index is not None else daily_revenue_data.timestamp
+    timestamps = [int(ts) for ts in timestamps]
+    datetimes = [dt.fromtimestamp(ts) for ts in timestamps]
+
+    # Remove values from profit_loss until the first non-0.0 equity value
+    profit_loss = daily_revenue_data.profit_loss[first_non_zero_index:] if first_non_zero_index is not None else daily_revenue_data.profit_loss
+
     daily_revenue_data_dict = {
-        "timestamp": [int(ts) for ts in daily_revenue_data.timestamp],
-        "datetime": [dt.fromtimestamp(ts) for ts in daily_revenue_data.timestamp],
-        "equity": daily_revenue_data.equity,
-        "profit_loss": daily_revenue_data.profit_loss
+        "timestamp": timestamps,
+        "datetime": timestamps,
+        "equity": equity,
+        "profit_loss": profit_loss
     }
 
     return daily_revenue_data_dict
