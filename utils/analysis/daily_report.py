@@ -80,13 +80,10 @@ def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
     if test == True:
         plt.show()
 
-    # Get equity after first investment (remove 0.0 values)
-    equity = [equity for equity in portfolio_history["equity"] if equity > 0.0]
-
     # Interest rate per cycle time serie
     interest_rates = [
-        round(equity[i] / equity[i - 1] - 1, 4)
-        for i in range(1, len(equity))
+        round(portfolio_history["equity"][i] / portfolio_history["equity"][i - 1] - 1, 4)
+        for i in range(1, len(portfolio_history["equity"]))
     ]
 
     report_data = {
