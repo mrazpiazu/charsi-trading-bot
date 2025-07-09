@@ -67,6 +67,7 @@ def send_telegram_report(report_data):
         f"Min Profit/Loss: ${report_data['min_profit_loss']}\n"
         f"Avg Profit/Loss: ${report_data['avg_profit_loss']}\n"
         f"Avg Interest Rate: {report_data['avg_interest_rate']}%\n"
+        f"Cycle End Interest Rate: {report_data['final_interest_rate']}%\n"
     )
 
     url = f"https://api.telegram.org/bot{api_token}/sendMessage"
