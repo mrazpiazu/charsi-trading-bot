@@ -82,7 +82,7 @@ def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
 
     # Interest rate per cycle time serie
     interest_rates = [
-        round(portfolio_history["equity"][i] / portfolio_history["equity"][i - 1] - 1, 4)
+        round((portfolio_history["equity"][i] / portfolio_history["equity"][i - 1] - 1) * 100, 2)
         for i in range(1, len(portfolio_history["equity"]))
     ]
 
@@ -95,8 +95,8 @@ def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
         "max_profit_loss": round(max(profit_loss_changes), 2),
         "min_profit_loss": round(min(profit_loss_changes), 2),
         "avg_profit_loss": round(sum(profit_loss_changes) / len(profit_loss_changes), 2),
-        "avg_interest_rate": round(sum(interest_rates) / len(interest_rates), 4),
-        "final_interest_rate": round(portfolio_history["equity"][-1] / portfolio_history["equity"][0] - 1, 4),
+        "avg_interest_rate": round(sum(interest_rates) / len(interest_rates), 2),
+        "final_interest_rate": round((portfolio_history["equity"][-1] / portfolio_history["equity"][0] - 1) * 100, 2) * 100,
         "plots": {}
     }
 
