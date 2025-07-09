@@ -80,6 +80,12 @@ def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
     if test == True:
         plt.show()
 
+    # Interest rate per cycle time serie
+    interest_rates = [
+        round(portfolio_history["equity"][i] / portfolio_history["equity"][i - 1] - 1, 4)
+        for i in range(1, len(portfolio_history["equity"]))
+    ]
+
     report_data = {
         "total_profit_loss": round(portfolio_history["profit_loss"][-1] - portfolio_history["profit_loss"][0], 2),
         "total_equity": round(portfolio_history["equity"][-1], 2),
@@ -89,6 +95,7 @@ def generate_revenue_report(portfolio_history, timeframe="Day", test=False):
         "max_profit_loss": round(max(profit_loss_changes), 2),
         "min_profit_loss": round(min(profit_loss_changes), 2),
         "avg_profit_loss": round(sum(profit_loss_changes) / len(profit_loss_changes), 2),
+        "avg_interest_rate": round(sum(interest_rates) / len(interest_rates), 4),
         "plots": {}
     }
 
@@ -107,8 +114,8 @@ if __name__ == "__main__":
 
     from utils.brokers.alpaca_market.alpaca_functions import get_daily_revenue
 
-    # portfolio_history = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H", budget=False)
-    portfolio_history = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D", budget=False)
+    portfolio_history = get_daily_revenue(period_offset_days=0, time_unit="D", time_unit_value=1, timeframe="1H", budget=False)
+    # portfolio_history = get_daily_revenue(period_offset_days=30, time_unit="M", time_unit_value=1, timeframe="1D", budget=False)
 
     report_data = generate_revenue_report(portfolio_history, test=True)
 
